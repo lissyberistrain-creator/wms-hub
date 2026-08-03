@@ -20,9 +20,9 @@ export default function App() {
   
   const [aiAnalysis, setAiAnalysis] = useState('Нажмите кнопку анализа, чтобы ИИ проверил загруженные задачи на узкие места и перегрузки разработчиков.');
 
-  // Загрузка данных из опубликованной Google Таблицы
+  // Загрузка данных из конкретного CSV-листа Roadmap вашей таблицы
   useEffect(() => {
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0GX3QmtDRXUnfif0sO1qLIYbolQdooVhacv01D12GcfJHaP-kXzigZIBzdgl2NpdaUUPPbZfV6A5_/pub?output=csv';
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0GX3QmtDRXUnfif0sO1qLIYbolQdooVhacv01D12GcfJHaP-kXzigZIBzdgl2NpdaUUPPbZfV6A5_/pub?gid=1820795425&single=true&output=csv';
 
     fetch(csvUrl)
       .then(response => response.text())
@@ -32,7 +32,7 @@ export default function App() {
           return matches.map(val => val.replace(/^"|"$/g, '').trim());
         });
 
-        const parsedTasks = rows.filter(r => r.length > 2 && r[0] && !isNaN(r[0])).map((r, index) => ({
+        const parsedTasks = rows.slice(1).filter(r => r.length > 2 && r[0]).map((r, index) => ({
           id: r[0] || index + 1,
           project: r[1] || 'Общие',
           name: r[2] || 'Без названия',
