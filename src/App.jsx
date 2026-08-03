@@ -16,28 +16,33 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedProject, setSelectedProject] = useState('all');
   const [tasks, setTasks] = useState([]);
+  const [teamWorkload, setTeamWorkload] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Состояние для настоящего ИИ-чата
   const [chatMessages, setChatMessages] = useState([
     { role: 'assistant', content: 'Привет! Я твой ИИ-ассистент по WMS Hub. Я проанализировал данные из твоей Google Таблицы. Задавай любые вопросы по задачам, срокам, распределению команды или логистике!' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  // Загрузка данных из конкретного CSV-листа Roadmap вашей таблицы
   useEffect(() => {
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0GX3QmtDRXUnfif0sO1qLIYbolQdooVhacv01D12GcfJHaP-kXzigZIBzdgl2NpdaUUPPbZfV6A5_/pub?gid=1820795425&single=true&output=csv';
+    // Ссылки на опубликованные листы Google Таблицы
+    const roadmapUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0GX3QmtDRXUnfif0sO1qLIYbolQdooVhacv01D12GcfJHaP-kXzigZIBzdgl2NpdaUUPPbZfV6A5_/pub?gid=1820795425&single=true&output=csv';
+    const devsUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0GX3QmtDRXUnfif0sO1qLIYbolQdooVhacv01D12GcfJHaP-kXzigZIBzdgl2NpdaUUPPbZfV6A5_/pub?gid=1094489822&single=true&output=csv';
 
-    fetch(csvUrl)
-      .then(response => response.text())
-      .then(csvText => {
-        const rows = csvText.split('\n').map(row => {
+    // Загружаем обе таблицы параллельно
+    Promise.all([
+      fetch(roadmapUrl).then(res => res.text()),
+      fetch(devsUrl).then(res => res.text())
+    ])
+      .then(([roadmapText, devsText]) => {
+        // Парсим Roadmap
+        const roadmapRows = roadmapText.split('\n').map(row => {
           const matches = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || row.split(',');
           return matches.map(val => val.replace(/^"|"$/g, '').trim());
         });
 
-        const parsedTasks = rows.slice(1).filter(r => r.length > 2 && r[0]).map((r, index) => ({
+        const parsedTasks = roadmapRows.slice(1).filter(r => r.length > 2 && r[0]).map((r, index) => ({
           id: r[0] || index + 1,
           project: r[1] || 'Общие',
           name: r[2] || 'Без названия',
@@ -47,29 +52,51 @@ export default function App() {
           deadline: r[17] || '2026-12-31',
           link: r[15] && r[15].startsWith('http') ? r[15] : '#'
         }));
-
         setTasks(parsedTasks);
+
+        // Парсим GanttDevelopers (Занятость команды)
+        const devsRows = devsText.split('\n').map(row => {
+          const matches = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || row.split(',');
+          return matches.map(val => val.replace(/^"|"$/g, '').trim());
+        });
+
+        // Ищем строки с разработчиками в таблице загрузки (пропускаем заголовки)
+        const parsedDevs = [];
+        let isDevSection = false;
+        for (const r of devsRows) {
+          if (r.some(cell => cell.includes('ЗАГРУЗКА РАЗРАБОТЧИКОВ'))) {
+            isDevSection = true;
+            continue;
+          }
+          if (isDevSection && r.some(cell => cell.includes('ЗАНЯТОСТЬ ПО МЕСЯЦАМ'))) {
+            break;
+          }
+          // Если строка содержит данные разработчика (Разработчик, Роль, Задач, Дней, Статус)
+          if (isDevSection && r.length >= 5 && r[0] && r[0] !== 'Разработчик' && !r[0].includes('⚠️')) {
+            parsedDevs.push({
+              name: r[0],
+              role: r[1] || '-',
+              tasks: parseInt(r[2]) || 0,
+              days: parseInt(r[3]) || 0,
+              status: r[4] || '✅ Норма'
+            });
+          }
+        }
+        
+        if (parsedDevs.length > 0) {
+          setTeamWorkload(parsedDevs);
+        }
+
         setLoading(false);
       })
       .catch(err => {
-        console.error('Ошибка загрузки таблицы:', err);
+        console.error('Ошибка загрузки данных:', err);
         setLoading(false);
       });
   }, []);
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
 
-  const teamWorkload = [
-    { name: 'Сухоруков Роман', role: 'Mobile', tasks: 2, days: 92, status: '⚠️ Высокая нагрузка' },
-    { name: 'Довгань Алексей', role: 'OLAP', tasks: 1, days: 65, status: '⚠️ Высокая нагрузка' },
-    { name: 'Голик Егор', role: 'DB', tasks: 2, days: 31, status: '⚠️ Высокая нагрузка' },
-    { name: 'Сергей', role: 'Frontend', tasks: 1, days: 10, status: '✅ Норма' },
-    { name: 'Вавулин Елисей', role: 'Mobile', tasks: 1, days: 4, status: '✅ Норма' },
-    { name: 'Брянцев Александр', role: 'Backend', tasks: 2, days: 3, status: '✅ Норма' },
-    { name: 'Цветкова Арина', role: 'DB', tasks: 1, days: 2, status: '✅ Норма' }
-  ];
-
-  // Функция отправки сообщения в ИИ-чат с анализом загруженных задач
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
@@ -80,7 +107,6 @@ export default function App() {
     setInputMessage('');
     setIsTyping(true);
 
-    // Интеллектуальный ответ на основе данных проекта
     setTimeout(() => {
       let reply = '';
       const lower = userText.toLowerCase();
@@ -91,13 +117,10 @@ export default function App() {
         const work = tasks.filter(t => t.status.includes('В работе') || t.status.includes('Тестирование')).length;
         const backlog = tasks.filter(t => t.status.includes('Бэклог')).length;
         reply = `📊 Всего в Roadmap загружено ${total} задач:\n- Выполнено: ${done}\n- В работе / Тест: ${work}\n- В бэклоге: ${backlog}`;
-      } else if (lower.includes('роман') || lower.includes('сухоруков') || lower.includes('перегруз')) {
-        reply = `⚠️ По данным команды, у Сухорукова Романа (Mobile) высокая нагрузка: 2 задачи общей сложностью 92 рабочих дня. Стоит проверить распределение мобильных задач.`;
-      } else if (lower.includes('приоритет') || lower.includes('важн')) {
-        const high = tasks.filter(t => t.priority === 'Высокий' || t.priority === 'Критичный');
-        reply = `🔥 На текущий момент в Roadmap зафиксировано ${high.length} задач с высоким и критичным приоритетом. Основной фокус идет на модули инвентаризации и мобильные рефакторинги.`;
+      } else if (lower.includes('нагрузк') || lower.includes('команд') || lower.includes('разработчик')) {
+        reply = `👥 Информация по загрузке команды подгружена из Google Таблицы (${teamWorkload.length} сотрудников). Проверить детали можно во вкладке «Занятость команд».`;
       } else {
-        reply = `🤖 Я проанализировал твой запрос в контексте текущих проектов WMS Hub (${tasks.length} задач в системе). Чтобы я мог выполнять полноценные вызовы к внешним LLM API (например, OpenAI или Gemini), в этот файл можно встроить ` + '`fetch`' + ` запрос к твоему бэкенду или API-ключу. Чем еще помочь по проекту?';
+        reply = `🤖 Я проанализировал твой запрос в контексте текущих проектов WMS Hub (${tasks.length} задач в системе). Чем еще помочь по проекту?`;
       }
 
       setChatMessages([...newMessages, { role: 'assistant', content: reply }]);
@@ -127,7 +150,7 @@ export default function App() {
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center font-sans">
         <div className="flex items-center gap-3 text-lg bg-slate-900 border border-slate-800 px-6 py-4 rounded-2xl shadow-xl">
           <Loader2 className="animate-spin text-fuchsia-500" size={24} />
-          <span className="text-slate-300">Загрузка данных из Google Таблицы...</span>
+          <span className="text-slate-300">Загрузка данных из Google Таблиц...</span>
         </div>
       </div>
     );
@@ -135,7 +158,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans selection:bg-fuchsia-500 selection:text-white">
-      {/* Боковое меню */}
       <aside className="w-64 bg-slate-900/80 backdrop-blur border-r border-slate-800 flex flex-col">
         <div className="p-6 border-b border-slate-800">
           <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-fuchsia-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
@@ -176,7 +198,6 @@ export default function App() {
         </div>
       </aside>
 
-      {/* Основной контент */}
       <main className="flex-1 flex flex-col overflow-y-auto">
         <header className="h-18 bg-slate-900/50 backdrop-blur border-b border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-4">
@@ -315,9 +336,9 @@ export default function App() {
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
               <div>
                 <h3 className="text-lg font-semibold text-slate-200 flex items-center gap-2">
-                  <Users className="text-fuchsia-400" /> Занятость разработчиков (2025-2026)
+                  <Users className="text-fuchsia-400" /> Занятость разработчиков (Динамически из Google Таблиц)
                 </h3>
-                <p className="text-slate-400 text-sm mt-1">Информация о нагрузке команды на основе расчетов в таблице.</p>
+                <p className="text-slate-400 text-sm mt-1">Информация загружается в реальном времени из листа GanttDevelopers.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -329,7 +350,7 @@ export default function App() {
                     </div>
                     <div>
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        dev.status.includes('Высокая') 
+                        dev.status.includes('Высокая') || dev.status.includes('Перегружен')
                           ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' 
                           : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                       }`}>
@@ -344,7 +365,6 @@ export default function App() {
 
           {activeTab === 'ai' && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl h-[calc(100vh-160px)] flex flex-col justify-between">
-              {/* Шапка чата */}
               <div className="pb-4 border-b border-slate-800 flex items-center gap-3">
                 <div className="p-2.5 bg-fuchsia-600/10 text-fuchsia-400 rounded-xl border border-fuchsia-500/20">
                   <Bot size={22} />
@@ -355,7 +375,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* История сообщений */}
               <div className="flex-1 overflow-y-auto py-6 space-y-4 pr-2">
                 {chatMessages.map((msg, index) => (
                   <div 
@@ -390,7 +409,6 @@ export default function App() {
                 )}
               </div>
 
-              {/* Поле ввода сообщения */}
               <form onSubmit={handleSendMessage} className="pt-4 border-t border-slate-800 flex gap-3">
                 <input 
                   type="text"
