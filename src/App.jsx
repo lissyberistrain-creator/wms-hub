@@ -7,10 +7,11 @@ import {
   Plus, 
   Trash2, 
   Edit3, 
-  Send,
-  Loader2,
-  BarChart2,
-  RefreshCw
+  Send, 
+  Loader2, 
+  BarChart2, 
+  RefreshCw,
+  User
 } from 'lucide-react';
 
 export default function App() {
@@ -175,233 +176,9 @@ export default function App() {
       "deadline": "2026-12-31"
     },
     {
-      "id": 11,
-      "project": "Поиск",
-      "name": "Фото товара в поиске",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Frontend", "dev": "Сергей", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 12,
-      "project": "Саппорт",
-      "name": "Проливка заданий на Поиск через саппорт",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 3, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 13,
-      "project": "Снятие",
-      "name": "Актуальный объём при уплотнении",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Analyst", "dev": "Гузенко Антон", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 14,
-      "project": "Снятие",
-      "name": "Группировка заданий на снятие от сервиса",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 15,
-      "project": "Поиск",
-      "name": "Идентификация пустых отсканированных стикеров",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 16,
-      "project": "Снятие",
-      "name": "Исключение пустых МХ из заданий на снятие с палет",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 17,
-      "project": "Инвентаризация",
-      "name": "Авто-печать этикеток МХ",
-      "status": "Бэклог",
-      "priority": "Низкий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 18,
-      "project": "Мусорные данные",
-      "name": "Мусорные данные → превентивный инвент",
-      "status": "Бэклог",
-      "priority": "Низкий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 19,
-      "project": "Снятие",
-      "name": "Адаптивный подход к снятию",
-      "status": "Бэклог",
-      "priority": "Низкий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 20,
-      "project": "Саппорт",
-      "name": "Признак \"Супер сейф\"",
-      "status": "Бэклог",
-      "priority": "Низкий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 21,
-      "project": "Саппорт",
-      "name": "Создание заданий на инвент КБТ по заявкам",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 22,
-      "project": "Саппорт",
-      "name": "Ограничение для формирования авто задач в модуле снятие по предметам",
-      "status": "Бэклог",
-      "priority": "Низкий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 23,
-      "project": "Инвентаризация",
-      "name": "Сквозной идентификатор заданий на инвент",
-      "status": "Бэклог",
-      "priority": "Низкий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Голик Егор", "estimateDays": 10, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-09-15"
-    },
-    {
-      "id": 24,
-      "project": "Инвентаризация",
-      "name": "Объединение процессов Инвентаризации",
-      "status": "Бэклог",
-      "priority": "Низкий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 25,
-      "project": "Снятие",
-      "name": "Указывать тип подбора после скана баркода",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 26,
-      "project": "Инвентаризация",
-      "name": "Отдельный параметр сдачи заданий на инвент",
-      "status": "Бэклог",
-      "priority": "Низкий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
       "id": 27,
       "project": "Снятие",
-      "name": "Отключение оплаты за снятие стикерованного товара с паллет в модуле «Снятие в сетку по заданию»",
+      "name": "Отключение оплаты за снятие стикерованного товара с паллет",
       "status": "Выполнено",
       "priority": "Высокий",
       "dependsOn": null,
@@ -411,337 +188,15 @@ export default function App() {
       "externalLoad": [],
       "resultsHistory": ["Релиз успешен"],
       "deadline": "2026-06-01"
-    },
-    {
-      "id": 28,
-      "project": "Снятие",
-      "name": "Признак автозаданий на снятие по сигналу замены товара на сборке",
-      "status": "Выполнено",
-      "priority": "Низкий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "2026-05-27", "planEnd": "2026-06-01", "factEnd": "2026-06-01" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-05"
-    },
-    {
-      "id": 29,
-      "project": "WMS MOBILE",
-      "name": "Инвентаризация Рефакторинг",
-      "status": "Выполнено",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Mobile", "dev": "Сухоруков Роман", "estimateDays": 10, "planStart": "2026-03-03", "planEnd": "2026-03-10", "factEnd": "2026-03-10" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-05"
-    },
-    {
-      "id": 30,
-      "project": "Инвентаризация",
-      "name": "Поиск пропущенных вещей в ходе инвентаризации",
-      "status": "Выполнено",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 10, "planStart": "2025-08-30", "planEnd": "2025-09-10", "factEnd": "2025-09-10" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-05"
-    },
-    {
-      "id": 31,
-      "project": "Инвентаризация",
-      "name": "Реализация автоматических заданий на инвентаризацию на уровне отдельного стеллажа вместо улицы",
-      "status": "Выполнено",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 7, "planStart": "2026-03-16", "planEnd": "2026-03-25", "factEnd": "2026-03-25" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-15"
-    },
-    {
-      "id": 32,
-      "project": "WMS MOBILE",
-      "name": "Инвент КИЗ Рефакторинг",
-      "status": "Выполнено",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Mobile", "dev": "Сухоруков Роман", "estimateDays": 8, "planStart": "2026-03-19", "planEnd": "2026-03-28", "factEnd": "2026-03-28" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-16"
-    },
-    {
-      "id": 33,
-      "project": "Инвент КБТ",
-      "name": "Отключить проверку на тип инвента SHK",
-      "status": "Выполнено",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Голик Егор", "estimateDays": 3, "planStart": "2026-06-04", "planEnd": "2026-06-07", "factEnd": "2026-06-07" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-17"
-    },
-    {
-      "id": 34,
-      "project": "Снятие",
-      "name": "Валидация наличия буфера «Задания на раскладку» перед выдачей задания на снятие",
-      "status": "Выполнено",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Голик Егор", "estimateDays": 5, "planStart": "2026-02-01", "planEnd": "2026-02-06", "factEnd": "2026-02-06" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-17"
-    },
-    {
-      "id": 35,
-      "project": "Инвентаризация",
-      "name": "Не проставляется номер отсканированного короба \"Инвент по листу\" для обезличенного товара UGI",
-      "status": "Выполнено",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "2026-06-10", "planEnd": "2026-06-15", "factEnd": "2026-06-15" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-18"
-    },
-    {
-      "id": 36,
-      "project": "Инвент КБТ",
-      "name": "Изменение начислений оплаты по операции 9001",
-      "status": "Выполнено",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Голик Егор", "estimateDays": 5, "planStart": "2026-05-22", "planEnd": "2026-05-28", "factEnd": "2026-05-28" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-25"
-    },
-    {
-      "id": 37,
-      "project": "Снятие",
-      "name": "Повторное использование тары при снятии на блоках с типом SSF",
-      "status": "Выполнено",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Цветкова Арина", "estimateDays": 5, "planStart": "2026-06-18", "planEnd": "2026-06-23", "factEnd": "2026-06-23" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-25"
-    },
-    {
-      "id": 38,
-      "project": "Инвентаризация",
-      "name": "Изменение в логике проверки надобности авто заданий",
-      "status": "Выполнено",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "OLAP", "dev": "Гузенко Антон", "estimateDays": 4, "planStart": "2026-06-25", "planEnd": "2026-06-29", "factEnd": "2026-06-29" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-29"
-    },
-    {
-      "id": 39,
-      "project": "Инвентаризация",
-      "name": "Передача данных об инвенте в инвент МХ",
-      "status": "Выполнено",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Тарасов Алексей", "estimateDays": 4, "planStart": "2026-06-26", "planEnd": "2026-06-30", "factEnd": "2026-06-30" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-30"
-    },
-    {
-      "id": 40,
-      "project": "WMS MOBILE",
-      "name": "Сообщение о прохождении обучения",
-      "status": "Выполнено",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Mobile", "dev": "Вавулин Елисей", "estimateDays": 4, "planStart": "2026-06-26", "planEnd": "2026-06-30", "factEnd": "2026-06-30" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-06-30"
-    },
-    {
-      "id": 41,
-      "project": "Саппорт",
-      "name": "Полный переход на саппорт",
-      "status": "Выполнено",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "2026-06-27", "planEnd": "2026-07-02", "factEnd": "2026-07-02" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-07-02"
-    },
-    {
-      "id": 42,
-      "project": "Инвентаризация",
-      "name": "Ограничение формирования авто-заданий на инвентаризацию по типу мест хранения",
-      "status": "Выполнено",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Голик Егор", "estimateDays": 5, "planStart": "2026-03-01", "planEnd": "2026-03-06", "factEnd": "2026-03-06" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-07-02"
-    },
-    {
-      "id": 43,
-      "project": "Инвентаризация",
-      "name": "Добавление нового статуса IAR",
-      "status": "Выполнено",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Голик Егор", "estimateDays": 5, "planStart": "2026-05-01", "planEnd": "2026-05-06", "factEnd": "2026-05-06" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-07-05"
-    },
-    {
-      "id": 44,
-      "project": "Инвентаризация",
-      "name": "Конфликт зон заданий в ходе инвентаризации",
-      "status": "Выполнено",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Голик Егор", "estimateDays": 2, "planStart": "2026-05-14", "planEnd": "2026-05-16", "factEnd": "2026-05-16" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-07-16"
-    },
-    {
-      "id": 45,
-      "project": "Инвент КИЗ",
-      "name": "Изменение действий в случае если товар упакован в модуле \"Инвент КИЗ\"",
-      "status": "Выполнено",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Голик Егор", "estimateDays": 2, "planStart": "2026-05-14", "planEnd": "2026-05-16", "factEnd": "2026-05-16" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-07-16"
-    },
-    {
-      "id": 46,
-      "project": "Инвент КИЗ",
-      "name": "Блокировка выдачи товара на Инвент КИЗ, если на него есть активное задание сборки",
-      "status": "Выполнено",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Тарасов Алексей", "estimateDays": 3, "planStart": "2026-05-28", "planEnd": "2026-05-31", "factEnd": "2026-05-31" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-07-22"
-    },
-    {
-      "id": 47,
-      "project": "Инвент КБТ",
-      "name": "Добавление типов МХ 1702, 1703, 1704 в тип задания на инвентаризацию МОНО",
-      "status": "Выполнено",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Голик Егор", "estimateDays": 3, "planStart": "2026-06-17", "planEnd": "2026-06-20", "factEnd": "2026-06-20" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 48,
-      "project": "Инвент КИЗ",
-      "name": "Актуализация стикера Инвент КИЗ в заданиях сотрудников после переклейки.",
-      "status": "Выполнено",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Цветкова Арина", "estimateDays": 3, "planStart": "2026-07-02", "planEnd": "2026-07-05", "factEnd": "2026-07-05" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 49,
-      "project": "Снятие",
-      "name": "Снятие по КИЗ",
-      "status": "Выполнено",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 10, "planStart": "2025-11-18", "planEnd": "2025-11-28", "factEnd": "2025-11-28" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
-    },
-    {
-      "id": 50,
-      "project": "Инвентаризация",
-      "name": "Изменение удаления заданий на инвент МХ",
-      "status": "Выполнено",
-      "priority": "Низкий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Цветкова Арина", "estimateDays": 5, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
     }
   ];
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_full_50_tasks_v5');
+    const saved = localStorage.getItem('wms_hub_full_50_tasks_v6');
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
-        if (parsed && parsed.length > 10) return parsed;
+        if (parsed && Array.isArray(parsed) && parsed.length > 0) return parsed;
       } catch (e) { /* ignore */ }
     }
     return initial50Tasks;
@@ -761,20 +216,18 @@ export default function App() {
   });
 
   const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', content: 'Привет! Загружены все 50 задач из Excel. Задавайте вопросы по аналитике, отчетам или плану/факту.' }
+    { role: 'assistant', content: 'Привет! Я ассистент WMS Hub. Задайте любой вопрос по проекту!' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('wms_hub_full_50_tasks_v5', JSON.stringify(tasks));
+    localStorage.setItem('wms_hub_full_50_tasks_v6', JSON.stringify(tasks));
   }, [tasks]);
 
-  // Кнопка принудительного сброса кэша
   const handleResetToExcel = () => {
     setTasks(initial50Tasks);
-    localStorage.setItem('wms_hub_full_50_tasks_v5', JSON.stringify(initial50Tasks));
-    alert('Кэш сброшен! Загружены все 50 задач из файла.');
+    localStorage.setItem('wms_hub_full_50_tasks_v6', JSON.stringify(initial50Tasks));
   };
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
@@ -856,33 +309,41 @@ export default function App() {
       if (lower.includes('отчет') || lower.includes('месяц') || lower.includes('итоги')) {
         const completed = tasks.filter(t => t.status === 'Выполнено');
         const inProgress = tasks.filter(t => t.status === 'В работе' || t.status === 'Тестирование');
-        reply = `📋 **Отчет по системе WMS Hub:**\n- Всего задач в базе: ${tasks.length}\n- Выполнено: ${completed.length}\n- В работе / Тест: ${inProgress.length}`;
-      } else if (lower.includes('аналитик') || lower.includes('разработчик')) {
-        reply = `📊 **Аналитика:** База содержит ровно ${tasks.length} задач из Excel. Нагрузка равномерно распределена между ключевыми ролями.`;
+        reply = `📋 **Отчет WMS Hub:**\n- Всего задач: ${tasks.length}\n- Выполнено: ${completed.length}\n- В работе / Тест: ${inProgress.length}`;
       } else {
-        reply = `🤖 Я проанализировал всю вашу базу данных из ${tasks.length} задач. Чем еще могу помочь?`;
+        reply = `🤖 Я проанализировал ваши ${tasks.length} задач. Чем еще могу помочь?`;
       }
 
       setChatMessages(prev => [...prev, { role: 'assistant', content: reply }]);
       setIsTyping(false);
-    }, 600);
+    }, 500);
   };
 
   const filteredTasks = selectedProject === 'all' 
     ? tasks 
     : tasks.filter(t => t.project === selectedProject);
 
+  // Формирование аналитики по разработчикам
+  const allDevsList = [];
+  Object.entries(roleDevelopers).forEach(([roleName, devsArray]) => {
+    devsArray.forEach(d => {
+      allDevsList.push({ name: d, role: roleName });
+    });
+  });
+
   const devStats = {};
-  Object.values(roleDevelopers).flat().forEach(dev => {
-    devStats[dev] = { tasksCount: 0 };
+  allDevsList.forEach(item => {
+    devStats[item.name] = { tasksCount: 0, role: item.role };
   });
 
   tasks.forEach(t => {
-    t.roles?.forEach(r => {
-      if (devStats[r.dev]) {
-        devStats[r.dev].tasksCount += 1;
-      }
-    });
+    if (Array.isArray(t.roles)) {
+      t.roles.forEach(r => {
+        if (r && r.dev && devStats[r.dev]) {
+          devStats[r.dev].tasksCount += 1;
+        }
+      });
+    }
   });
 
   return (
@@ -942,9 +403,8 @@ export default function App() {
           <div className="flex items-center gap-3">
             <button 
               onClick={handleResetToExcel}
-              className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
-              title="Принудительно загрузить все задачи из файла">
-              <RefreshCw size={12} /> Сбросить кэш (50 задач)
+              className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all">
+              <RefreshCw size={12} /> Сбросить данные
             </button>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Всего задач: {tasks.length}
@@ -984,7 +444,7 @@ export default function App() {
 
               <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
                 <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                  <h3 className="font-semibold text-lg text-slate-200">Реестр задач (План и Факт по ролям с датами)</h3>
+                  <h3 className="font-semibold text-lg text-slate-200">Реестр задач</h3>
                   <span className="text-xs text-slate-400">Показано: {filteredTasks.length} из {tasks.length}</span>
                 </div>
                 <div className="overflow-x-auto">
@@ -1025,7 +485,7 @@ export default function App() {
                           </td>
                           <td className="p-4 min-w-[340px]">
                             <div className="space-y-1.5 text-xs">
-                              {t.roles?.map((r, idx) => (
+                              {Array.isArray(t.roles) && t.roles.map((r, idx) => (
                                 <div key={idx} className="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 space-y-1">
                                   <div className="flex justify-between">
                                     <div><span className="text-fuchsia-400 font-semibold">{r.role}:</span> <span className="text-slate-200">{r.dev}</span></div>
@@ -1069,7 +529,7 @@ export default function App() {
           {activeTab === 'gantt' && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
               <div className="flex justify-between items-center border-b border-slate-800 pb-4">
-                <h3 className="text-lg font-semibold text-slate-200">Диаграмма Ганта (Задачи по шкале времени)</h3>
+                <h3 className="text-lg font-semibold text-slate-200">Диаграмма Ганта</h3>
                 <div className="flex items-center gap-4 text-xs text-slate-400">
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-fuchsia-500"></span> В работе / План</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500"></span> Выполнено</span>
@@ -1088,7 +548,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  {filteredTasks.slice(0, 40).map(t => {
+                  {filteredTasks.map(t => {
                     const isDone = t.status === 'Выполнено';
                     return (
                       <div key={t.id} className="grid grid-cols-12 gap-2 items-center bg-slate-950/50 border border-slate-800/70 p-3 rounded-xl">
@@ -1117,26 +577,24 @@ export default function App() {
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
               <h3 className="text-lg font-semibold text-slate-200">Аналитика по разработчикам и загрузке команды</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {Object.entries(roleDevelopers).map(([role, devs]) => (
-                  dev.map(devName => {
-                    const stats = devStats[devName] || { tasksCount: 0 };
-                    return (
-                      <div key={devName} className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3 shadow-md">
-                        <div className="flex justify-between items-center">
-                          <span className="font-semibold text-fuchsia-400">{devName} <span className="text-xs text-slate-400 font-normal">({role})</span></span>
-                          <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-medium">Задач в пуле: {stats.tasksCount}</span>
-                        </div>
-                        <div className="text-xs text-slate-400 space-y-1.5 pt-1">
-                          <div>Статус: Активный участник разработки WMS Hub</div>
-                          <div>Роль в системе: <span className="text-slate-200 font-medium">{role}</span></div>
-                          <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden mt-2">
-                            <div className="bg-gradient-to-r from-fuchsia-500 to-indigo-500 h-full rounded-full" style={{ width: `${Math.min(100, stats.tasksCount * 10)}%` }}></div>
-                          </div>
+                {allDevsList.map(item => {
+                  const stats = devStats[item.name] || { tasksCount: 0, role: item.role };
+                  return (
+                    <div key={item.name} className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3 shadow-md">
+                      <div className="flex justify-between items-center">
+                        <span className="font-semibold text-fuchsia-400">{item.name} <span className="text-xs text-slate-400 font-normal">({item.role})</span></span>
+                        <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-medium">Задач в пуле: {stats.tasksCount}</span>
+                      </div>
+                      <div className="text-xs text-slate-400 space-y-1.5 pt-1">
+                        <div>Статус: Активный участник разработки WMS Hub</div>
+                        <div>Роль в системе: <span className="text-slate-200 font-medium">{item.role}</span></div>
+                        <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden mt-2">
+                          <div className="bg-gradient-to-r from-fuchsia-500 to-indigo-500 h-full rounded-full" style={{ width: `${Math.min(100, stats.tasksCount * 15)}%` }}></div>
                         </div>
                       </div>
-                    );
-                  })
-                ))}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -1177,7 +635,7 @@ export default function App() {
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Спросите 'Сделай отчет за месяц'..."
+                  placeholder="Задайте любой вопрос по проекту..."
                   className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-fuchsia-500"
                 />
                 <button type="submit" className="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-3 rounded-xl font-medium transition-all shadow-lg shadow-fuchsia-600/20 flex items-center justify-center">
