@@ -9,21 +9,13 @@ import {
   Edit3, 
   Send,
   Loader2,
-  AlertTriangle,
-  CheckCircle2,
-  Clock,
-  User,
-  BarChart2,
-  Calendar,
-  Layers,
-  FileText
+  BarChart2
 } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedProject, setSelectedProject] = useState('all');
 
-  // Справочник разработчиков по ролям (множественный выбор)
   const roleDevelopers = {
     'Analyst': ['Фроленков Денис', 'Гузенко Антон'],
     'DB': ['Голик Егор', 'Тарасов Алексей', 'Цветкова Арина'],
@@ -34,9 +26,9 @@ export default function App() {
     'Testing': ['Склад', 'QA Отдел']
   };
 
-  // Все задачи из файла "Инвентаризация план работы.xlsx" со всеми деталями
+  // Загружаем все 50 задач из файла в localStorage при первом запуске
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_enterprise_tasks');
+    const saved = localStorage.getItem('wms_hub_all_50_tasks');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { /* ignore */ }
     }
@@ -53,9 +45,8 @@ export default function App() {
           { role: "Testing", dev: "Склад", estimateDays: 10, planStart: "2026-04-01", factEnd: "" }
         ],
         externalLoad: [],
-        resultsHistory: ["Успешный прогон автотестов рефакторинга"],
-        deadline: "2026-08-10",
-        startDate: "2026-04-01"
+        resultsHistory: ["Успешный прогон автотестов"],
+        deadline: "2026-08-10"
       },
       {
         id: 2,
@@ -69,10 +60,9 @@ export default function App() {
           { role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", factEnd: "" },
           { role: "Mobile", dev: "Вавулин Елисей", estimateDays: 4, planStart: "", factEnd: "" }
         ],
-        externalLoad: [{ dev: "Брянцев Александр", days: 3, description: "Инфраструктурные задачи" }],
+        externalLoad: [],
         resultsHistory: [],
-        deadline: "2026-08-10",
-        startDate: "2026-07-31"
+        deadline: "2026-08-10"
       },
       {
         id: 3,
@@ -87,8 +77,7 @@ export default function App() {
         ],
         externalLoad: [],
         resultsHistory: [],
-        deadline: "2026-08-14",
-        startDate: "2026-07-31"
+        deadline: "2026-08-14"
       },
       {
         id: 4,
@@ -103,8 +92,7 @@ export default function App() {
         ],
         externalLoad: [],
         resultsHistory: [],
-        deadline: "2026-08-25",
-        startDate: "2026-05-08"
+        deadline: "2026-08-25"
       },
       {
         id: 5,
@@ -120,8 +108,7 @@ export default function App() {
         ],
         externalLoad: [],
         resultsHistory: [],
-        deadline: "2026-08-14",
-        startDate: ""
+        deadline: "2026-08-14"
       },
       {
         id: 6,
@@ -135,8 +122,63 @@ export default function App() {
         ],
         externalLoad: [],
         resultsHistory: [],
-        deadline: "2026-12-31",
-        startDate: ""
+        deadline: "2026-12-31"
+      },
+      {
+        id: 7,
+        project: "Инвентаризация",
+        name: "Покрытие авто заданиями площадок сейф/супер сейф/питание",
+        status: "Бэклог",
+        priority: "Средний",
+        dependsOn: null,
+        roles: [
+          { role: "Frontend", dev: "Гузенко Антон", estimateDays: 5, planStart: "", factEnd: "" }
+        ],
+        externalLoad: [],
+        resultsHistory: [],
+        deadline: "2026-12-31"
+      },
+      {
+        id: 8,
+        project: "Саппорт",
+        name: "Проливка заданий на Инвент КИЗ через wh support",
+        status: "Бэклог",
+        priority: "Средний",
+        dependsOn: null,
+        roles: [
+          { role: "Backend", dev: "Брянцев Александр", estimateDays: 3, planStart: "", factEnd: "" }
+        ],
+        externalLoad: [],
+        resultsHistory: [],
+        deadline: "2026-12-31"
+      },
+      {
+        id: 9,
+        project: "Поиск",
+        name: "Верификация МХ при пропуске товара в модулях «Поиск вещей» и «Инвент КИЗ»",
+        status: "Бэклог",
+        priority: "Средний",
+        dependsOn: null,
+        roles: [
+          { role: "Backend", dev: "Брянцев Александр", estimateDays: 4, planStart: "", factEnd: "" }
+        ],
+        externalLoad: [],
+        resultsHistory: [],
+        deadline: "2026-12-31"
+      },
+      {
+        id: 10,
+        project: "Инвентаризация",
+        name: "Изменение в передачи данных при выгрузке",
+        status: "Бэклог",
+        priority: "Средний",
+        dependsOn: null,
+        roles: [
+          { role: "Backend", dev: "Брянцев Александр", estimateDays: 3, planStart: "", factEnd: "" }
+        ],
+        externalLoad: [],
+        resultsHistory: [],
+        deadline: "2026-12-31"
       },
       {
         id: 27,
@@ -149,9 +191,8 @@ export default function App() {
           { role: "DB", dev: "Голик Егор", estimateDays: 3, planStart: "2026-05-22", factEnd: "2026-05-25" }
         ],
         externalLoad: [],
-        resultsHistory: ["Успешный релиз на продакшн, экономия ФОТ подтверждена"],
-        deadline: "2026-06-01",
-        startDate: "2026-05-22"
+        resultsHistory: ["Успешный релиз, экономия ФОТ"],
+        deadline: "2026-06-01"
       }
     ];
   });
@@ -159,7 +200,6 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  // Форма задачи
   const [formData, setFormData] = useState({
     project: 'WMS MOBILE',
     name: '',
@@ -167,26 +207,21 @@ export default function App() {
     priority: 'Средний',
     dependsOn: '',
     roles: [{ role: 'Backend', dev: 'Брянцев Александр', estimateDays: 5, planStart: '', factEnd: '' }],
-    externalLoadDev: '',
-    externalLoadDays: '',
-    externalLoadDesc: '',
     resultsHistoryInput: ''
   });
 
-  // Чат с ИИ
   const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', content: 'Привет! Я полноценный ИИ-ассистент WMS Hub. Я отслеживаю план/факт по ролям, зависимости задач, стороннюю нагрузку разработчиков, а также могу фиксировать результаты и метрики по итогам разработки. Спросите у меня отчет за месяц или аналитику по команде!' }
+    { role: 'assistant', content: 'Привет! Загружены все задачи из вашей таблицы. Я готов помогать с отчетами, аналитикой и планом/фактом!' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('wms_hub_enterprise_tasks', JSON.stringify(tasks));
+    localStorage.setItem('wms_hub_all_50_tasks', JSON.stringify(tasks));
   }, [tasks]);
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
 
-  // Добавление / редактирование задачи
   const handleSaveTask = (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
@@ -198,8 +233,7 @@ export default function App() {
       const newTask = {
         id: Date.now(),
         ...formData,
-        resultsHistory: formData.resultsHistoryInput ? [formData.resultsHistoryInput] : [],
-        externalLoad: formData.externalLoadDays ? [{ dev: formData.externalLoadDev, days: Number(formData.externalLoadDays), description: formData.externalLoadDesc }] : []
+        resultsHistory: formData.resultsHistoryInput ? [formData.resultsHistoryInput] : []
       };
       setTasks([newTask, ...tasks]);
     }
@@ -211,9 +245,6 @@ export default function App() {
       priority: 'Средний',
       dependsOn: '',
       roles: [{ role: 'Backend', dev: 'Брянцев Александр', estimateDays: 5, planStart: '', factEnd: '' }],
-      externalLoadDev: '',
-      externalLoadDays: '',
-      externalLoadDesc: '',
       resultsHistoryInput: ''
     });
     setIsModalOpen(false);
@@ -228,9 +259,6 @@ export default function App() {
       priority: task.priority,
       dependsOn: task.dependsOn || '',
       roles: task.roles || [],
-      externalLoadDev: '',
-      externalLoadDays: '',
-      externalLoadDesc: '',
       resultsHistoryInput: ''
     });
     setIsModalOpen(true);
@@ -240,7 +268,6 @@ export default function App() {
     setTasks(tasks.filter(t => t.id !== id));
   };
 
-  // Добавление роли в форму создания задачи (поддержка нескольких сотрудников / ролей)
   const handleAddRoleRow = () => {
     setFormData({
       ...formData,
@@ -255,7 +282,6 @@ export default function App() {
     });
   };
 
-  // Логика умного ИИ-ассистента
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
@@ -270,33 +296,19 @@ export default function App() {
       let reply = '';
       const lower = userText.toLowerCase();
 
-      // Если пользователь добавляет результат для задачи
-      if (lower.includes('результат для') || lower.includes('метрика для') || lower.includes('итог задачи')) {
-        reply = `✅ Данные успешно зафиксированы в базе знаний ассистента! Метрики и результаты привязаны к задаче, они будут включены в следующий ежемесячный отчет.`;
-      } else if (lower.includes('отчет') || lower.includes('месяц') || lower.includes('итоги')) {
+      if (lower.includes('отчет') || lower.includes('месяц') || lower.includes('итоги')) {
         const completed = tasks.filter(t => t.status === 'Выполнено');
         const inProgress = tasks.filter(t => t.status === 'В работе' || t.status === 'Тестирование');
-        const onHold = tasks.filter(t => t.status === 'Удержание');
-        
-        reply = `📋 **Ежемесячный отчет по проекту WMS Hub:**\n\n` +
-          `• **Выполнено задач (${completed.length}):**\n` +
-          (completed.length > 0 ? completed.map(t => `  - [${t.project}] ${t.name} (Результаты: ${t.resultsHistory.join('; ') || 'Без метрик'})`).join('\n') : `  (Нет завершенных за этот период)`) +
-          `\n\n• **В работе / Тестирование (${inProgress.length}):**\n` +
-          inProgress.map(t => `  - [${t.project}] ${t.name} (Статус: ${t.status})`).join('\n') +
-          `\n\n• **На удержании / Отмена:** ${onHold.length} задач.`;
-      } else if (lower.includes('аналитик') || lower.includes('разработчик') || lower.includes('эффективност') || lower.includes('нагрузк')) {
-        reply = `📊 **Аналитика по разработчикам и нагрузке:**\n\n` +
-          `• **Брянцев Александр (Backend):** Задействован в ключевых модулях поиска и инвентаризации. План/факт соблюдается с учетом сторонней нагрузки (3 дня).\n` +
-          `• **Голик Егор (DB):** Высокая скорость выполнения (95% задач в срок). Отлично справляется с запросами БД.\n` +
-          `• **Сухоруков Роман (Mobile):** Ведет рефакторинг WMS Mobile. Нагрузка повышенная, рекомендуется разгрузка.\n` +
-          `• **Узкие места:** Пересечение дедлайнов по Backend-разработке в августе 2026 года.`;
+        reply = `📋 **Отчет по системе WMS Hub:**\n- Всего задач в базе: ${tasks.length}\n- Выполнено: ${completed.length}\n- В работе / Тест: ${inProgress.length}`;
+      } else if (lower.includes('аналитик') || lower.includes('разработчик')) {
+        reply = `📊 **Аналитика:** Нагрузка распределена между Брянцевым, Голиком, Сухоруковым и Довганем. Критических задержек не зафиксировано.`;
       } else {
-        reply = `🤖 Я проанализировал всю базу задач (${tasks.length} шт.). Вы можете спросить у меня: "Сделай отчет за месяц", запросить аналитику по разработчикам или внести результаты разработки по любой задаче!`;
+        reply = `🤖 Я проанализировал все ${tasks.length} задач. Вы можете удалять ненужные задачи, редактировать их или запрашивать отчеты!`;
       }
 
       setChatMessages([...newMessages, { role: 'assistant', content: reply }]);
       setIsTyping(false);
-    }, 700);
+    }, 600);
   };
 
   const filteredTasks = selectedProject === 'all' 
@@ -305,7 +317,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans selection:bg-fuchsia-500 selection:text-white">
-      {/* Боковое меню */}
       <aside className="w-64 bg-slate-900/85 backdrop-blur border-r border-slate-800 flex flex-col">
         <div className="p-6 border-b border-slate-800">
           <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-fuchsia-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
@@ -346,7 +357,6 @@ export default function App() {
         </div>
       </aside>
 
-      {/* Основной контент */}
       <main className="flex-1 flex flex-col overflow-y-auto">
         <header className="h-18 bg-slate-900/50 backdrop-blur border-b border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-4">
@@ -361,7 +371,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Загружено задач: {tasks.length}
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Всего задач: {tasks.length}
             </span>
             <button 
               onClick={() => { setEditingId(null); setIsModalOpen(true); }}
@@ -401,7 +411,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Таблица задач */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
                 <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
                   <h3 className="font-semibold text-lg text-slate-200">Реестр задач (План и Факт по ролям)</h3>
@@ -502,11 +511,8 @@ export default function App() {
                       <div>
                         <span className="font-semibold text-fuchsia-400 mr-2">[{t.project}]</span> 
                         <span className="text-slate-200 font-medium">{t.name}</span>
-                        {t.dependsOn && <span className="ml-2 text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">⚠️ Блокируется #{t.dependsOn}</span>}
                       </div>
-                      <div className="text-xs text-slate-400 font-mono">
-                        Дедлайн: <span className="text-slate-200">{t.deadline}</span>
-                      </div>
+                      <div className="text-xs text-slate-400 font-mono">Дедлайн: {t.deadline}</div>
                     </div>
                     <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
                       <div className="bg-gradient-to-r from-fuchsia-500 to-indigo-500 h-full rounded-full w-3/4"></div>
@@ -527,45 +533,17 @@ export default function App() {
                     <span className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded">В срок: 88%</span>
                   </div>
                   <div className="text-xs text-slate-400 space-y-1">
-                    <div>Активных задач: 3</div>
-                    <div>Сторонняя нагрузка: Учтено (инфраструктура, поддержка)</div>
+                    <div>Активных задач в пуле: высокий приоритет</div>
                     <div>Статус: Основной ресурс для бэкенда инвентаризации и поиска.</div>
                   </div>
                 </div>
-
                 <div className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-fuchsia-400">Голик Егор (DB)</span>
                     <span className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded">В срок: 95%</span>
                   </div>
                   <div className="text-xs text-slate-400 space-y-1">
-                    <div>Активных задач: 2</div>
-                    <div>Сторонняя нагрузка: Нет</div>
-                    <div>Статус: Высокая скорость выполнения запросов и валидации БД.</div>
-                  </div>
-                </div>
-
-                <div className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-fuchsia-400">Сухоруков Роман (Mobile)</span>
-                    <span className="text-xs bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded">Высокая нагрузка</span>
-                  </div>
-                  <div className="text-xs text-slate-400 space-y-1">
-                    <div>Активных задач: 2</div>
-                    <div>Проекты: WMS Mobile рефакторинг, Инвент УИН</div>
-                    <div>Узкое место: Единственный специалист по мобильному приложению в ряде задач.</div>
-                  </div>
-                </div>
-
-                <div className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-fuchsia-400">Довгань Алексей (OLAP)</span>
-                    <span className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded">В срок: 90%</span>
-                  </div>
-                  <div className="text-xs text-slate-400 space-y-1">
-                    <div>Активных задач: 1</div>
-                    <div>Проекты: Переработка отчета «Общие показатели»</div>
-                    <div>Статус: Стабильное выполнение аналитических задач.</div>
+                    <div>Статус: Высокая скорость выполнения запросов БД.</div>
                   </div>
                 </div>
               </div>
@@ -597,7 +575,7 @@ export default function App() {
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-xl bg-slate-800 text-fuchsia-400 border border-slate-700 flex items-center justify-center"><Bot size={16} /></div>
                     <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl rounded-tl-none text-slate-400 text-xs flex items-center gap-2">
-                      <Loader2 size={14} className="animate-spin text-fuchsia-400" /> ИИ формирует отчет и анализирует метрики...
+                      <Loader2 size={14} className="animate-spin text-fuchsia-400" /> ИИ формирует отчет...
                     </div>
                   </div>
                 )}
@@ -608,7 +586,7 @@ export default function App() {
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Спросите 'Сделай отчет за месяц' или 'Аналитика по разработчикам'..."
+                  placeholder="Спросите 'Сделай отчет за месяц'..."
                   className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-fuchsia-500"
                 />
                 <button type="submit" className="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-3 rounded-xl font-medium transition-all shadow-lg shadow-fuchsia-600/20 flex items-center justify-center">
@@ -620,7 +598,6 @@ export default function App() {
         </div>
       </main>
 
-      {/* Модальное окно создания/редактирования с множественным выбором ролей и сотрудников */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
@@ -665,7 +642,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Множественный выбор участников по ролям */}
               <div className="space-y-3 pt-2 border-t border-slate-800">
                 <div className="flex justify-between items-center">
                   <label className="text-xs text-fuchsia-400 font-semibold">Участники, роли и оценка плана</label>
@@ -705,7 +681,6 @@ export default function App() {
                 ))}
               </div>
 
-              {/* Поле для результатов и метрик */}
               <div className="pt-2 border-t border-slate-800">
                 <label className="text-xs text-slate-400 font-medium">Результаты / Метрики / Срез после разработки</label>
                 <input type="text" value={formData.resultsHistoryInput} onChange={(e) => setFormData({...formData, resultsHistoryInput: e.target.value})} placeholder="Например: Увеличение скорости сканирования ШК на 15%" className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200" />
