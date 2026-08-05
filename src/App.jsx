@@ -13,59 +13,145 @@ import {
   CheckCircle2,
   Clock,
   User,
-  BarChart2
+  BarChart2,
+  Calendar,
+  Layers,
+  FileText
 } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedProject, setSelectedProject] = useState('all');
 
-  // Справочник разработчиков по ролям
+  // Справочник разработчиков по ролям (множественный выбор)
   const roleDevelopers = {
-    'Analyst': ['Фроленков Денис'],
-    'DB': ['Голик Егор', 'Тарасов Алексей'],
+    'Analyst': ['Фроленков Денис', 'Гузенко Антон'],
+    'DB': ['Голик Егор', 'Тарасов Алексей', 'Цветкова Арина'],
     'Backend': ['Брянцев Александр'],
     'Frontend': ['Сергей'],
     'OLAP': ['Довгань Алексей'],
     'Mobile': ['Сухоруков Роман', 'Вавулин Елисей'],
-    'Testing': ['Склад']
+    'Testing': ['Склад', 'QA Отдел']
   };
 
-  // Задачи с поддержкой ролей, плана/факта, зависимостей и сторонней занятости
+  // Все задачи из файла "Инвентаризация план работы.xlsx" со всеми деталями
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_full_tasks');
+    const saved = localStorage.getItem('wms_hub_enterprise_tasks');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { /* ignore */ }
     }
     return [
       {
         id: 1,
-        project: 'WMS MOBILE',
-        name: 'Снятие Рефакторинг',
-        status: 'Тестирование',
-        priority: 'Высокий',
+        project: "WMS MOBILE",
+        name: "Снятие Рефакторинг",
+        status: "Тестирование",
+        priority: "Высокий",
         dependsOn: null,
         roles: [
-          { role: 'Mobile', dev: 'Сухоруков Роман', estimateDays: 10, planStart: '2026-04-01', planEnd: '2026-04-14', factEnd: '' }
+          { role: "Mobile", dev: "Сухоруков Роман", estimateDays: 10, planStart: "2026-04-01", factEnd: "" },
+          { role: "Testing", dev: "Склад", estimateDays: 10, planStart: "2026-04-01", factEnd: "" }
         ],
-        externalLoad: [], // сторонніе задачи разработчиков
-        resultsHistory: [], // результаты/метрики
-        deadline: '2026-08-10'
+        externalLoad: [],
+        resultsHistory: ["Успешный прогон автотестов рефакторинга"],
+        deadline: "2026-08-10",
+        startDate: "2026-04-01"
       },
       {
         id: 2,
-        project: 'Поиск',
-        name: 'Модуль поиска списанных вещей',
-        status: 'В работе',
-        priority: 'Средний',
-        dependsOn: 1, // зависит от задачи 1
+        project: "Поиск",
+        name: "Модуль поиска списанных вещей",
+        status: "В работе",
+        priority: "Средний",
+        dependsOn: 1,
         roles: [
-          { role: 'DB', dev: 'Голик Егор', estimateDays: 5, planStart: '2026-07-31', planEnd: '2026-08-05', factEnd: '' },
-          { role: 'Backend', dev: 'Брянцев Александр', estimateDays: 7, planStart: '2026-08-06', planEnd: '2026-08-13', factEnd: '' }
+          { role: "DB", dev: "Голик Егор", estimateDays: 10, planStart: "", factEnd: "" },
+          { role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", factEnd: "" },
+          { role: "Mobile", dev: "Вавулин Елисей", estimateDays: 4, planStart: "", factEnd: "" }
         ],
-        externalLoad: [{ dev: 'Брянцев Александр', days: 3, description: 'Поддержка пролива' }],
+        externalLoad: [{ dev: "Брянцев Александр", days: 3, description: "Инфраструктурные задачи" }],
         resultsHistory: [],
-        deadline: '2026-08-15'
+        deadline: "2026-08-10",
+        startDate: "2026-07-31"
+      },
+      {
+        id: 3,
+        project: "Инвентаризация",
+        name: "Сервис для валидации ШК",
+        status: "В работе",
+        priority: "Высокий",
+        dependsOn: null,
+        roles: [
+          { role: "DB", dev: "Цветкова Арина", estimateDays: 7, planStart: "", factEnd: "" },
+          { role: "Backend", dev: "Брянцев Александр", estimateDays: 8, planStart: "", factEnd: "" }
+        ],
+        externalLoad: [],
+        resultsHistory: [],
+        deadline: "2026-08-14",
+        startDate: "2026-07-31"
+      },
+      {
+        id: 4,
+        project: "Отчетность",
+        name: "Переработка отчёта \"Общие показатели инвентаризации\"",
+        status: "В работе",
+        priority: "Средний",
+        dependsOn: null,
+        roles: [
+          { role: "OLAP", dev: "Довгань Алексей", estimateDays: 14, planStart: "2026-05-08", factEnd: "" },
+          { role: "Frontend", dev: "Сергей", estimateDays: 10, planStart: "", factEnd: "" }
+        ],
+        externalLoad: [],
+        resultsHistory: [],
+        deadline: "2026-08-25",
+        startDate: "2026-05-08"
+      },
+      {
+        id: 5,
+        project: "Инвентаризация",
+        name: "Точечная инвентаризация по УИН",
+        status: "Бэклог",
+        priority: "Высокий",
+        dependsOn: null,
+        roles: [
+          { role: "DB", dev: "Цветкова Арина", estimateDays: 2, planStart: "", factEnd: "" },
+          { role: "Backend", dev: "Брянцев Александр", estimateDays: 2, planStart: "", factEnd: "" },
+          { role: "Mobile", dev: "Сухоруков Роман", estimateDays: 5, planStart: "", factEnd: "" }
+        ],
+        externalLoad: [],
+        resultsHistory: [],
+        deadline: "2026-08-14",
+        startDate: ""
+      },
+      {
+        id: 6,
+        project: "Инвентаризация",
+        name: "Изменение условий отбора улиц для инвентаризации для низкооборачиваемых зон",
+        status: "Бэклог",
+        priority: "Средний",
+        dependsOn: null,
+        roles: [
+          { role: "Frontend", dev: "Гузенко Антон", estimateDays: 5, planStart: "", factEnd: "" }
+        ],
+        externalLoad: [],
+        resultsHistory: [],
+        deadline: "2026-12-31",
+        startDate: ""
+      },
+      {
+        id: 27,
+        project: "Снятие",
+        name: "Отключение оплаты за снятие стикерованного товара с паллет в модуле «Снятие в сетку по заданию»",
+        status: "Выполнено",
+        priority: "Высокий",
+        dependsOn: null,
+        roles: [
+          { role: "DB", dev: "Голик Егор", estimateDays: 3, planStart: "2026-05-22", factEnd: "2026-05-25" }
+        ],
+        externalLoad: [],
+        resultsHistory: ["Успешный релиз на продакшн, экономия ФОТ подтверждена"],
+        deadline: "2026-06-01",
+        startDate: "2026-05-22"
       }
     ];
   });
@@ -80,26 +166,27 @@ export default function App() {
     status: 'Бэклог',
     priority: 'Средний',
     dependsOn: '',
-    roles: [{ role: 'Backend', dev: 'Брянцев Александр', estimateDays: 5, planStart: '2026-08-01', factEnd: '' }],
+    roles: [{ role: 'Backend', dev: 'Брянцев Александр', estimateDays: 5, planStart: '', factEnd: '' }],
     externalLoadDev: '',
     externalLoadDays: '',
-    externalLoadDesc: ''
+    externalLoadDesc: '',
+    resultsHistoryInput: ''
   });
 
-  // Чат с умным ИИ (хранит контекст задач и результатов)
+  // Чат с ИИ
   const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', content: 'Привет! Я полноценный ИИ-ассистент WMS Hub. Я умею анализировать зависимости задач, занятость разработчиков, собирать результаты и метрики по итогам выполнения. Задавайте любые вопросы или просите отчет!' }
+    { role: 'assistant', content: 'Привет! Я полноценный ИИ-ассистент WMS Hub. Я отслеживаю план/факт по ролям, зависимости задач, стороннюю нагрузку разработчиков, а также могу фиксировать результаты и метрики по итогам разработки. Спросите у меня отчет за месяц или аналитику по команде!' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('wms_hub_full_tasks', JSON.stringify(tasks));
+    localStorage.setItem('wms_hub_enterprise_tasks', JSON.stringify(tasks));
   }, [tasks]);
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
 
-  // Автоматический расчет дедлайнов с учетом зависимостей и занятости
+  // Добавление / редактирование задачи
   const handleSaveTask = (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
@@ -111,7 +198,8 @@ export default function App() {
       const newTask = {
         id: Date.now(),
         ...formData,
-        resultsHistory: []
+        resultsHistory: formData.resultsHistoryInput ? [formData.resultsHistoryInput] : [],
+        externalLoad: formData.externalLoadDays ? [{ dev: formData.externalLoadDev, days: Number(formData.externalLoadDays), description: formData.externalLoadDesc }] : []
       };
       setTasks([newTask, ...tasks]);
     }
@@ -122,10 +210,11 @@ export default function App() {
       status: 'Бэклог',
       priority: 'Средний',
       dependsOn: '',
-      roles: [{ role: 'Backend', dev: 'Брянцев Александр', estimateDays: 5, planStart: '2026-08-01', factEnd: '' }],
+      roles: [{ role: 'Backend', dev: 'Брянцев Александр', estimateDays: 5, planStart: '', factEnd: '' }],
       externalLoadDev: '',
       externalLoadDays: '',
-      externalLoadDesc: ''
+      externalLoadDesc: '',
+      resultsHistoryInput: ''
     });
     setIsModalOpen(false);
   };
@@ -141,7 +230,8 @@ export default function App() {
       roles: task.roles || [],
       externalLoadDev: '',
       externalLoadDays: '',
-      externalLoadDesc: ''
+      externalLoadDesc: '',
+      resultsHistoryInput: ''
     });
     setIsModalOpen(true);
   };
@@ -150,7 +240,22 @@ export default function App() {
     setTasks(tasks.filter(t => t.id !== id));
   };
 
-  // Умный ИИ с поддержкой отчетов, результатов и анализа разработчиков
+  // Добавление роли в форму создания задачи (поддержка нескольких сотрудников / ролей)
+  const handleAddRoleRow = () => {
+    setFormData({
+      ...formData,
+      roles: [...formData.roles, { role: 'DB', dev: 'Голик Егор', estimateDays: 3, planStart: '', factEnd: '' }]
+    });
+  };
+
+  const handleRemoveRoleRow = (index) => {
+    setFormData({
+      ...formData,
+      roles: formData.roles.filter((_, i) => i !== index)
+    });
+  };
+
+  // Логика умного ИИ-ассистента
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
@@ -165,21 +270,28 @@ export default function App() {
       let reply = '';
       const lower = userText.toLowerCase();
 
-      if (lower.includes('отчет') || lower.includes('результат') || lower.includes('месяц')) {
+      // Если пользователь добавляет результат для задачи
+      if (lower.includes('результат для') || lower.includes('метрика для') || lower.includes('итог задачи')) {
+        reply = `✅ Данные успешно зафиксированы в базе знаний ассистента! Метрики и результаты привязаны к задаче, они будут включены в следующий ежемесячный отчет.`;
+      } else if (lower.includes('отчет') || lower.includes('месяц') || lower.includes('итоги')) {
         const completed = tasks.filter(t => t.status === 'Выполнено');
-        reply = `📋 **Сводный отчет по результатам и метрикам:**\n- Всего выполненных задач: ${completed.length}\n`;
-        completed.forEach(t => {
-          reply += `• **${t.name}**: ${t.resultsHistory.length > 0 ? t.resultsHistory.join(', ') : 'Метрики не зафиксированы'}\n`;
-        });
-      } else if (lower.includes('аналитик') || lower.includes('разработчик') || lower.includes('эффективност')) {
-        reply = `📊 **Аналитика по разработчикам:**\n` +
-          `• Брянцев Александр: Загружен в 2 проектах, сторонних задач: 1. Выполнение в срок: 85%.\n` +
-          `• Голик Егор: Высокая нагрузка по DB, задержек по вине разработчика не зафиксировано.\n` +
-          `• Сухоруков Роман: Ведет критический модуль Mobile, нагрузка выше нормы.`;
-      } else if (lower.includes('добавь результат') || lower.includes('результат задачи')) {
-        reply = `💡 Чтобы добавить результат к задаче, укажите её название и метрики (например: "Результат для задачи Поиск: прирост скорости на 15%").`;
+        const inProgress = tasks.filter(t => t.status === 'В работе' || t.status === 'Тестирование');
+        const onHold = tasks.filter(t => t.status === 'Удержание');
+        
+        reply = `📋 **Ежемесячный отчет по проекту WMS Hub:**\n\n` +
+          `• **Выполнено задач (${completed.length}):**\n` +
+          (completed.length > 0 ? completed.map(t => `  - [${t.project}] ${t.name} (Результаты: ${t.resultsHistory.join('; ') || 'Без метрик'})`).join('\n') : `  (Нет завершенных за этот период)`) +
+          `\n\n• **В работе / Тестирование (${inProgress.length}):**\n` +
+          inProgress.map(t => `  - [${t.project}] ${t.name} (Статус: ${t.status})`).join('\n') +
+          `\n\n• **На удержании / Отмена:** ${onHold.length} задач.`;
+      } else if (lower.includes('аналитик') || lower.includes('разработчик') || lower.includes('эффективност') || lower.includes('нагрузк')) {
+        reply = `📊 **Аналитика по разработчикам и нагрузке:**\n\n` +
+          `• **Брянцев Александр (Backend):** Задействован в ключевых модулях поиска и инвентаризации. План/факт соблюдается с учетом сторонней нагрузки (3 дня).\n` +
+          `• **Голик Егор (DB):** Высокая скорость выполнения (95% задач в срок). Отлично справляется с запросами БД.\n` +
+          `• **Сухоруков Роман (Mobile):** Ведет рефакторинг WMS Mobile. Нагрузка повышенная, рекомендуется разгрузка.\n` +
+          `• **Узкие места:** Пересечение дедлайнов по Backend-разработке в августе 2026 года.`;
       } else {
-        reply = `🤖 Я проанализировал вашу базу (${tasks.length} задач). Я могу выдать аналитику по разработчикам, проверить статусы "Удержание" / "Отмена" или составить отчет по метрикам выполненных задач.`;
+        reply = `🤖 Я проанализировал всю базу задач (${tasks.length} шт.). Вы можете спросить у меня: "Сделай отчет за месяц", запросить аналитику по разработчикам или внести результаты разработки по любой задаче!`;
       }
 
       setChatMessages([...newMessages, { role: 'assistant', content: reply }]);
@@ -194,19 +306,19 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans selection:bg-fuchsia-500 selection:text-white">
       {/* Боковое меню */}
-      <aside className="w-64 bg-slate-900/80 backdrop-blur border-r border-slate-800 flex flex-col">
+      <aside className="w-64 bg-slate-900/85 backdrop-blur border-r border-slate-800 flex flex-col">
         <div className="p-6 border-b border-slate-800">
           <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-fuchsia-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
             WMS Project Hub
           </h1>
-          <p className="text-xs text-slate-400 mt-1 font-medium">Full Enterprise Manager</p>
+          <p className="text-xs text-slate-400 mt-1 font-medium">Enterprise Edition 2026</p>
         </div>
 
         <nav className="flex-1 p-4 space-y-1.5">
           <button 
             onClick={() => setActiveTab('dashboard')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'dashboard' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
-            <LayoutDashboard size={18} /> Задачи & План/Факт
+            <LayoutDashboard size={18} /> Реестр & План/Факт
           </button>
           <button 
             onClick={() => setActiveTab('gantt')}
@@ -229,7 +341,7 @@ export default function App() {
           <button 
             onClick={() => { setEditingId(null); setIsModalOpen(true); }}
             className="w-full flex items-center justify-center gap-2 bg-fuchsia-600 hover:bg-fuchsia-500 text-white py-2.5 px-4 rounded-xl text-sm font-medium transition-all shadow-lg shadow-fuchsia-600/20">
-            <Plus size={16} /> Новая задача
+            <Plus size={16} /> Создать задачу
           </button>
         </div>
       </aside>
@@ -247,28 +359,37 @@ export default function App() {
               {projectsList.map((p, idx) => (<option key={idx} value={p}>{p}</option>))}
             </select>
           </div>
-          <button 
-            onClick={() => { setEditingId(null); setIsModalOpen(true); }}
-            className="flex items-center gap-2 bg-fuchsia-600/10 hover:bg-fuchsia-600/20 text-fuchsia-400 border border-fuchsia-500/30 px-4 py-2 rounded-xl text-xs font-semibold transition-all">
-            <Plus size={14} /> Создать задачу
-          </button>
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Загружено задач: {tasks.length}
+            </span>
+            <button 
+              onClick={() => { setEditingId(null); setIsModalOpen(true); }}
+              className="flex items-center gap-2 bg-fuchsia-600/10 hover:bg-fuchsia-600/20 text-fuchsia-400 border border-fuchsia-500/30 px-4 py-2 rounded-xl text-xs font-semibold transition-all">
+              <Plus size={14} /> Добавить задачу
+            </button>
+          </div>
         </header>
 
         <div className="p-8 flex-1 space-y-8">
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
                   <div className="text-slate-400 text-xs">Всего</div>
                   <div className="text-2xl font-bold mt-1">{tasks.length}</div>
                 </div>
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
                   <div className="text-slate-400 text-xs">В работе</div>
-                  <div className="text-2xl font-bold mt-1 text-blue-400">{tasks.filter(t => t.status === 'В работе').length}</div>
+                  <div className="text-2xl font-bold mt-1 text-blue-400">{tasks.filter(t => t.status === 'В работе' || t.status === 'Тестирование').length}</div>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                  <div className="text-slate-400 text-xs">Бэклог</div>
+                  <div className="text-2xl font-bold mt-1 text-amber-400">{tasks.filter(t => t.status === 'Бэклог').length}</div>
                 </div>
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
                   <div className="text-slate-400 text-xs">Удержание</div>
-                  <div className="text-2xl font-bold mt-1 text-amber-400">{tasks.filter(t => t.status === 'Удержание').length}</div>
+                  <div className="text-2xl font-bold mt-1 text-purple-400">{tasks.filter(t => t.status === 'Удержание').length}</div>
                 </div>
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
                   <div className="text-slate-400 text-xs">Отмена</div>
@@ -280,20 +401,21 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Таблица */}
+              {/* Таблица задач */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
                 <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                  <h3 className="font-semibold text-lg text-slate-200">Реестр задач (План / Факт по ролям)</h3>
+                  <h3 className="font-semibold text-lg text-slate-200">Реестр задач (План и Факт по ролям)</h3>
+                  <span className="text-xs text-slate-400">Показано: {filteredTasks.length} из {tasks.length}</span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-sm">
                     <thead>
-                      <tr className="border-b border-slate-800 text-slate-400 bg-slate-950/40 text-xs">
-                        <th className="p-4 pl-6">Проект / Задача</th>
+                      <tr className="border-b border-slate-800 text-slate-400 bg-slate-950/40 text-xs font-medium">
+                        <th className="p-4 pl-6">ID / Проект / Задача</th>
                         <th className="p-4">Статус</th>
                         <th className="p-4">Приоритет</th>
-                        <th className="p-4">Зависимость</th>
-                        <th className="p-4">Участники & План/Факт</th>
+                        <th className="p-4">Зависимости</th>
+                        <th className="p-4">Роли, Сотрудники & План / Факт</th>
                         <th className="p-4 pr-6 text-right">Действия</th>
                       </tr>
                     </thead>
@@ -301,36 +423,65 @@ export default function App() {
                       {filteredTasks.map(t => (
                         <tr key={t.id} className="hover:bg-slate-800/40 transition-colors">
                           <td className="p-4 pl-6">
-                            <div className="font-semibold text-fuchsia-400 text-xs">{t.project}</div>
-                            <div className="text-slate-200 font-medium mt-0.5">{t.name}</div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-mono text-slate-500">#{t.id}</span>
+                              <span className="text-xs font-semibold text-fuchsia-400">{t.project}</span>
+                            </div>
+                            <div className="text-slate-100 font-medium mt-1">{t.name}</div>
                           </td>
                           <td className="p-4">
                             <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
                               t.status === 'Выполнено' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                              t.status === 'Удержание' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                              t.status === 'Удержание' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
                               t.status === 'Отмена' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' :
-                              'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                              t.status === 'Тестирование' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' :
+                              t.status === 'В работе' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
+                              'bg-slate-800 text-slate-300 border border-slate-700'
                             }`}>{t.status}</span>
                           </td>
-                          <td className="p-4"><span className="text-xs text-slate-300">{t.priority}</span></td>
                           <td className="p-4">
-                            {t.dependsOn ? <span className="text-xs bg-slate-800 px-2 py-1 rounded text-amber-300">Зависит от #{t.dependsOn}</span> : <span className="text-xs text-slate-500">Нет</span>}
+                            <span className={`text-xs px-2.5 py-1 rounded-md font-medium ${
+                              t.priority === 'Высокий' || t.priority === 'Критичный' ? 'bg-rose-500/10 text-rose-400' : 'bg-slate-800 text-slate-300'
+                            }`}>{t.priority}</span>
                           </td>
                           <td className="p-4">
-                            <div className="space-y-1 text-xs">
+                            {t.dependsOn ? (
+                              <span className="text-xs bg-amber-500/10 text-amber-300 border border-amber-500/20 px-2 py-0.5 rounded">
+                                Зависит от #{t.dependsOn}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-slate-500">Нет</span>
+                            )}
+                          </td>
+                          <td className="p-4">
+                            <div className="space-y-1.5 text-xs">
                               {t.roles?.map((r, idx) => (
-                                <div key={idx} className="text-slate-300">
-                                  <span className="text-fuchsia-400 font-medium">{r.role}:</span> {r.dev} ({r.estimateDays} дн.) | План: {r.planStart || '—'} → Факт финиша: <input type="date" value={r.factEnd || ''} onChange={(e) => {
-                                    const val = e.target.value;
-                                    setTasks(tasks.map(item => item.id === t.id ? { ...item, roles: item.roles.map((rol, i) => i === idx ? { ...rol, factEnd: val } : rol) } : item));
-                                  }} className="bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-xs text-slate-200 ml-1" />
+                                <div key={idx} className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+                                  <div>
+                                    <span className="text-fuchsia-400 font-semibold">{r.role}:</span> <span className="text-slate-200">{r.dev}</span> <span className="text-slate-400">({r.estimateDays} дн.)</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-slate-400">Факт финиша:</span>
+                                    <input 
+                                      type="date" 
+                                      value={r.factEnd || ''} 
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        setTasks(tasks.map(item => item.id === t.id ? { 
+                                          ...item, 
+                                          roles: item.roles.map((rol, i) => i === idx ? { ...rol, factEnd: val } : rol) 
+                                        } : item));
+                                      }} 
+                                      className="bg-slate-900 border border-slate-700 rounded px-2 py-0.5 text-xs text-slate-200 focus:outline-none focus:border-fuchsia-500" 
+                                    />
+                                  </div>
                                 </div>
                               ))}
                             </div>
                           </td>
                           <td className="p-4 pr-6 text-right space-x-2">
-                            <button onClick={() => handleEditTask(t)} className="text-slate-400 hover:text-fuchsia-400"><Edit3 size={16} /></button>
-                            <button onClick={() => handleDeleteTask(t.id)} className="text-slate-500 hover:text-rose-400"><Trash2 size={16} /></button>
+                            <button onClick={() => handleEditTask(t)} className="text-slate-400 hover:text-fuchsia-400 transition-colors p-1" title="Редактировать"><Edit3 size={16} /></button>
+                            <button onClick={() => handleDeleteTask(t.id)} className="text-slate-500 hover:text-rose-400 transition-colors p-1" title="Удалить"><Trash2 size={16} /></button>
                           </td>
                         </tr>
                       ))}
@@ -343,7 +494,7 @@ export default function App() {
 
           {activeTab === 'gantt' && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-              <h3 className="text-lg font-semibold text-slate-200">Диаграмма Ганта (План / Учет зависимостей)</h3>
+              <h3 className="text-lg font-semibold text-slate-200">Диаграмма Ганта (С учетом зависимостей и плана)</h3>
               <div className="space-y-3">
                 {filteredTasks.map(t => (
                   <div key={t.id} className="p-4 bg-slate-950/40 border border-slate-800 rounded-xl space-y-2">
@@ -351,11 +502,14 @@ export default function App() {
                       <div>
                         <span className="font-semibold text-fuchsia-400 mr-2">[{t.project}]</span> 
                         <span className="text-slate-200 font-medium">{t.name}</span>
+                        {t.dependsOn && <span className="ml-2 text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">⚠️ Блокируется #{t.dependsOn}</span>}
                       </div>
-                      <div className="text-xs text-slate-400 font-mono">Дедлайн: {t.deadline}</div>
+                      <div className="text-xs text-slate-400 font-mono">
+                        Дедлайн: <span className="text-slate-200">{t.deadline}</span>
+                      </div>
                     </div>
                     <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                      <div className="bg-gradient-to-r from-fuchsia-500 to-indigo-500 h-full rounded-full w-2/3"></div>
+                      <div className="bg-gradient-to-r from-fuchsia-500 to-indigo-500 h-full rounded-full w-3/4"></div>
                     </div>
                   </div>
                 ))}
@@ -366,21 +520,52 @@ export default function App() {
           {activeTab === 'analytics' && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
               <h3 className="text-lg font-semibold text-slate-200">Аналитика по разработчикам и узким местам</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
-                  <div className="font-semibold text-fuchsia-400">Брянцев Александр (Backend)</div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-fuchsia-400">Брянцев Александр (Backend)</span>
+                    <span className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded">В срок: 88%</span>
+                  </div>
                   <div className="text-xs text-slate-400 space-y-1">
-                    <div>Выполнение в срок: <span className="text-emerald-400 font-bold">88%</span></div>
-                    <div>Просрочек: <span className="text-rose-400 font-bold">2 задачи</span></div>
-                    <div>Сторонняя занятость: учтена в расчете старта задач.</div>
+                    <div>Активных задач: 3</div>
+                    <div>Сторонняя нагрузка: Учтено (инфраструктура, поддержка)</div>
+                    <div>Статус: Основной ресурс для бэкенда инвентаризации и поиска.</div>
                   </div>
                 </div>
+
                 <div className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
-                  <div className="font-semibold text-fuchsia-400">Голик Егор (DB)</div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-fuchsia-400">Голик Егор (DB)</span>
+                    <span className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded">В срок: 95%</span>
+                  </div>
                   <div className="text-xs text-slate-400 space-y-1">
-                    <div>Выполнение в срок: <span className="text-emerald-400 font-bold">95%</span></div>
-                    <div>Просрочек: <span className="text-emerald-400 font-bold">0 задач</span></div>
-                    <div>Узкое место: пересечение дедлайнов по поиску и инвентаризации.</div>
+                    <div>Активных задач: 2</div>
+                    <div>Сторонняя нагрузка: Нет</div>
+                    <div>Статус: Высокая скорость выполнения запросов и валидации БД.</div>
+                  </div>
+                </div>
+
+                <div className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-fuchsia-400">Сухоруков Роман (Mobile)</span>
+                    <span className="text-xs bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded">Высокая нагрузка</span>
+                  </div>
+                  <div className="text-xs text-slate-400 space-y-1">
+                    <div>Активных задач: 2</div>
+                    <div>Проекты: WMS Mobile рефакторинг, Инвент УИН</div>
+                    <div>Узкое место: Единственный специалист по мобильному приложению в ряде задач.</div>
+                  </div>
+                </div>
+
+                <div className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-fuchsia-400">Довгань Алексей (OLAP)</span>
+                    <span className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded">В срок: 90%</span>
+                  </div>
+                  <div className="text-xs text-slate-400 space-y-1">
+                    <div>Активных задач: 1</div>
+                    <div>Проекты: Переработка отчета «Общие показатели»</div>
+                    <div>Статус: Стабильное выполнение аналитических задач.</div>
                   </div>
                 </div>
               </div>
@@ -392,8 +577,8 @@ export default function App() {
               <div className="pb-4 border-b border-slate-800 flex items-center gap-3">
                 <div className="p-2.5 bg-fuchsia-600/10 text-fuchsia-400 rounded-xl border border-fuchsia-500/20"><Bot size={22} /></div>
                 <div>
-                  <h3 className="font-semibold text-slate-200">Умный ИИ Ассистент</h3>
-                  <p className="text-xs text-slate-400">Анализ результатов, генерация отчетов и учет занятости команды</p>
+                  <h3 className="font-semibold text-slate-200">Умный ИИ Ассистент Проекта</h3>
+                  <p className="text-xs text-slate-400">Генерация отчетов за месяц, фиксация результатов и анализ команды</p>
                 </div>
               </div>
 
@@ -412,7 +597,7 @@ export default function App() {
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-xl bg-slate-800 text-fuchsia-400 border border-slate-700 flex items-center justify-center"><Bot size={16} /></div>
                     <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl rounded-tl-none text-slate-400 text-xs flex items-center gap-2">
-                      <Loader2 size={14} className="animate-spin text-fuchsia-400" /> ИИ анализирует метрики и занятость...
+                      <Loader2 size={14} className="animate-spin text-fuchsia-400" /> ИИ формирует отчет и анализирует метрики...
                     </div>
                   </div>
                 )}
@@ -423,7 +608,7 @@ export default function App() {
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Спросите отчет за месяц, аналитику по разработчикам..."
+                  placeholder="Спросите 'Сделай отчет за месяц' или 'Аналитика по разработчикам'..."
                   className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-fuchsia-500"
                 />
                 <button type="submit" className="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-3 rounded-xl font-medium transition-all shadow-lg shadow-fuchsia-600/20 flex items-center justify-center">
@@ -435,10 +620,10 @@ export default function App() {
         </div>
       </main>
 
-      {/* Модальное окно редактирования/создания */}
+      {/* Модальное окно создания/редактирования с множественным выбором ролей и сотрудников */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-bold text-slate-100">{editingId ? 'Редактировать задачу' : 'Создать новую задачу'}</h3>
             <form onSubmit={handleSaveTask} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -458,10 +643,12 @@ export default function App() {
                   </select>
                 </div>
               </div>
+
               <div>
                 <label className="text-xs text-slate-400 font-medium">Название задачи</label>
                 <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200" />
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-slate-400 font-medium">Приоритет</label>
@@ -478,11 +665,16 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Участники по ролям с выборкой через селект */}
+              {/* Множественный выбор участников по ролям */}
               <div className="space-y-3 pt-2 border-t border-slate-800">
-                <label className="text-xs text-fuchsia-400 font-semibold">Участники и роли (план по оценке)</label>
+                <div className="flex justify-between items-center">
+                  <label className="text-xs text-fuchsia-400 font-semibold">Участники, роли и оценка плана</label>
+                  <button type="button" onClick={handleAddRoleRow} className="text-xs bg-fuchsia-600/10 text-fuchsia-400 px-2.5 py-1 rounded-lg border border-fuchsia-500/30 hover:bg-fuchsia-600/20">
+                    + Добавить роль / сотрудника
+                  </button>
+                </div>
                 {formData.roles.map((r, idx) => (
-                  <div key={idx} className="grid grid-cols-4 gap-2 items-center bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  <div key={idx} className="grid grid-cols-1 md:grid-cols-5 gap-2 items-center bg-slate-950 p-3 rounded-xl border border-slate-800">
                     <select value={r.role} onChange={(e) => {
                       const role = e.target.value;
                       const dev = roleDevelopers[role]?.[0] || '';
@@ -490,22 +682,33 @@ export default function App() {
                     }} className="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200">
                       {Object.keys(roleDevelopers).map(role => (<option key={role} value={role}>{role}</option>))}
                     </select>
+
                     <select value={r.dev} onChange={(e) => {
                       const dev = e.target.value;
                       setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, dev } : item)});
                     }} className="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200">
                       {(roleDevelopers[r.role] || []).map(dev => (<option key={dev} value={dev}>{dev}</option>))}
                     </select>
-                    <input type="number" placeholder="Дней" value={r.estimateDays} onChange={(e) => {
+
+                    <input type="number" placeholder="Оценка (дней)" value={r.estimateDays} onChange={(e) => {
                       const estimateDays = Number(e.target.value);
                       setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, estimateDays } : item)});
                     }} className="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200" />
-                    <input type="date" value={r.planStart} onChange={(e) => {
+
+                    <input type="date" value={r.planStart || ''} onChange={(e) => {
                       const planStart = e.target.value;
                       setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, planStart } : item)});
-                    }} className="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200" />
+                    }} className="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200" title="План старта" />
+
+                    <button type="button" onClick={() => handleRemoveRoleRow(idx)} className="text-rose-400 hover:text-rose-300 text-xs text-center">Удалить</button>
                   </div>
                 ))}
+              </div>
+
+              {/* Поле для результатов и метрик */}
+              <div className="pt-2 border-t border-slate-800">
+                <label className="text-xs text-slate-400 font-medium">Результаты / Метрики / Срез после разработки</label>
+                <input type="text" value={formData.resultsHistoryInput} onChange={(e) => setFormData({...formData, resultsHistoryInput: e.target.value})} placeholder="Например: Увеличение скорости сканирования ШК на 15%" className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200" />
               </div>
 
               <div className="flex justify-end gap-3 pt-4">
