@@ -11,11 +11,15 @@ import {
   Loader2, 
   BarChart2, 
   RefreshCw,
-  User
+  User,
+  Kanban,
+  CheckCircle2,
+  Clock,
+  AlertCircle
 } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('kanban'); // По умолчанию открываем YouGile доску
   const [selectedProject, setSelectedProject] = useState('all');
 
   const roleDevelopers = {
@@ -192,7 +196,7 @@ export default function App() {
   ];
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_full_50_tasks_v6');
+    const saved = localStorage.getItem('wms_hub_yougile_v7');
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
@@ -216,18 +220,18 @@ export default function App() {
   });
 
   const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', content: 'Привет! Я ассистент WMS Hub. Задайте любой вопрос по проекту!' }
+    { role: 'assistant', content: 'Привет! YouGile-доска WMS Hub активна. Вы можете перетаскивать задачи по колонкам статусов, управлять планом/фактом и запрашивать аналитику.' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('wms_hub_full_50_tasks_v6', JSON.stringify(tasks));
+    localStorage.setItem('wms_hub_yougile_v7', JSON.stringify(tasks));
   }, [tasks]);
 
   const handleResetToExcel = () => {
     setTasks(initial50Tasks);
-    localStorage.setItem('wms_hub_full_50_tasks_v6', JSON.stringify(initial50Tasks));
+    localStorage.setItem('wms_hub_yougile_v7', JSON.stringify(initial50Tasks));
   };
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
@@ -278,6 +282,11 @@ export default function App() {
     setTasks(tasks.filter(t => t.id !== id));
   };
 
+  // Быстрая смена статуса прямо на канбан-доске (как в YouGile)
+  const handleStatusChange = (taskId, newStatus) => {
+    setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
+  };
+
   const handleAddRoleRow = () => {
     setFormData({
       ...formData,
@@ -309,9 +318,9 @@ export default function App() {
       if (lower.includes('отчет') || lower.includes('месяц') || lower.includes('итоги')) {
         const completed = tasks.filter(t => t.status === 'Выполнено');
         const inProgress = tasks.filter(t => t.status === 'В работе' || t.status === 'Тестирование');
-        reply = `📋 **Отчет WMS Hub:**\n- Всего задач: ${tasks.length}\n- Выполнено: ${completed.length}\n- В работе / Тест: ${inProgress.length}`;
+        reply = `📋 **Сводка по доске YouGile:**\n- Всего задач: ${tasks.length}\n- Выполнено: ${completed.length}\n- В работе / Тест: ${inProgress.length}`;
       } else {
-        reply = `🤖 Я проанализировал ваши ${tasks.length} задач. Чем еще могу помочь?`;
+        reply = `🤖 Я проанализировал доску YouGile (${tasks.length} задач). Вы можете менять статусы карточек кликом прямо на доске!`;
       }
 
       setChatMessages(prev => [...prev, { role: 'assistant', content: reply }]);
@@ -323,7 +332,16 @@ export default function App() {
     ? tasks 
     : tasks.filter(t => t.project === selectedProject);
 
-  // Формирование аналитики по разработчикам
+  // Колонки YouGile
+  const kanbanColumns = [
+    { title: '📋 Бэклог', status: 'Бэклог', color: 'border-amber-500/30 bg-amber-500/5 text-amber-400' },
+    { title: '⚙️ В работе', status: 'В работе', color: 'border-blue-500/30 bg-blue-500/5 text-blue-400' },
+    { title: '🧪 Тестирование', status: 'Тестирование', color: 'border-indigo-500/30 bg-indigo-500/5 text-indigo-400' },
+    { title: '📦 Удержание', status: 'Удержание', color: 'border-purple-500/30 bg-purple-500/5 text-purple-400' },
+    { title: '🚫 Отмена', status: 'Отмена', color: 'border-rose-500/30 bg-rose-500/5 text-rose-400' },
+    { title: '✅ Выполнено', status: 'Выполнено', color: 'border-emerald-500/30 bg-emerald-500/5 text-emerald-400' }
+  ];
+
   const allDevsList = [];
   Object.entries(roleDevelopers).forEach(([roleName, devsArray]) => {
     devsArray.forEach(d => {
@@ -348,19 +366,26 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans selection:bg-fuchsia-500 selection:text-white">
-      <aside className="w-64 bg-slate-900/85 backdrop-blur border-r border-slate-800 flex flex-col h-screen overflow-hidden shrink-0">
-        <div className="p-6 border-b border-slate-800 shrink-0">
-          <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-fuchsia-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
-            WMS Project Hub
-          </h1>
-          <p className="text-xs text-slate-400 mt-1 font-medium">Enterprise Edition 2026</p>
+      {/* Боковое меню в стиле YouGile */}
+      <aside className="w-64 bg-slate-900/90 backdrop-blur border-r border-slate-800 flex flex-col h-screen overflow-hidden shrink-0">
+        <div className="p-6 border-b border-slate-800 shrink-0 flex items-center gap-3">
+          <div className="p-2 bg-fuchsia-600 rounded-xl text-white font-bold">YG</div>
+          <div>
+            <h1 className="text-base font-bold tracking-tight text-slate-100">WMS YouGile Hub</h1>
+            <p className="text-[11px] text-slate-400 font-medium">Канбан-доска 2026</p>
+          </div>
         </div>
 
         <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
           <button 
+            onClick={() => setActiveTab('kanban')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'kanban' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
+            <Kanban size={18} /> Канбан-доска
+          </button>
+          <button 
             onClick={() => setActiveTab('dashboard')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'dashboard' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
-            <LayoutDashboard size={18} /> Реестр & План/Факт
+            <LayoutDashboard size={18} /> Таблица & План/Факт
           </button>
           <button 
             onClick={() => setActiveTab('gantt')}
@@ -375,7 +400,7 @@ export default function App() {
           <button 
             onClick={() => setActiveTab('ai')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'ai' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
-            <Bot size={18} /> Умный ИИ Ассистент
+            <Bot size={18} /> ИИ Ассистент
           </button>
         </nav>
 
@@ -383,11 +408,12 @@ export default function App() {
           <button 
             onClick={() => { setEditingId(null); setIsModalOpen(true); }}
             className="w-full flex items-center justify-center gap-2 bg-fuchsia-600 hover:bg-fuchsia-500 text-white py-2.5 px-4 rounded-xl text-sm font-medium transition-all shadow-lg shadow-fuchsia-600/20">
-            <Plus size={16} /> Создать задачу
+            <Plus size={16} /> Новая задача
           </button>
         </div>
       </aside>
 
+      {/* Основная рабочая область */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="h-18 bg-slate-900/50 backdrop-blur border-b border-slate-800 px-8 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
@@ -404,47 +430,102 @@ export default function App() {
             <button 
               onClick={handleResetToExcel}
               className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all">
-              <RefreshCw size={12} /> Сбросить данные
+              <RefreshCw size={12} /> Сбросить доску
             </button>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Всего задач: {tasks.length}
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Всего карточек: {tasks.length}
             </span>
           </div>
         </header>
 
-        <div className="p-8 flex-1 overflow-y-auto space-y-8">
-          {activeTab === 'dashboard' && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-                  <div className="text-slate-400 text-xs">Всего</div>
-                  <div className="text-2xl font-bold mt-1">{tasks.length}</div>
-                </div>
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-                  <div className="text-slate-400 text-xs">В работе</div>
-                  <div className="text-2xl font-bold mt-1 text-blue-400">{tasks.filter(t => t.status === 'В работе' || t.status === 'Тестирование').length}</div>
-                </div>
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-                  <div className="text-slate-400 text-xs">Бэклог</div>
-                  <div className="text-2xl font-bold mt-1 text-amber-400">{tasks.filter(t => t.status === 'Бэклог').length}</div>
-                </div>
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-                  <div className="text-slate-400 text-xs">Удержание</div>
-                  <div className="text-2xl font-bold mt-1 text-purple-400">{tasks.filter(t => t.status === 'Удержание').length}</div>
-                </div>
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-                  <div className="text-slate-400 text-xs">Отмена</div>
-                  <div className="text-2xl font-bold mt-1 text-rose-400">{tasks.filter(t => t.status === 'Отмена').length}</div>
-                </div>
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-                  <div className="text-slate-400 text-xs">Выполнено</div>
-                  <div className="text-2xl font-bold mt-1 text-emerald-400">{tasks.filter(t => t.status === 'Выполнено').length}</div>
-                </div>
+        <div className="p-6 flex-1 overflow-y-auto">
+          {/* ВКЛАДКА КАНБАН-ДОСКА (YOUGILE STYLE) */}
+          {activeTab === 'kanban' && (
+            <div className="h-full flex flex-col space-y-4">
+              <div className="flex justify-between items-center shrink-0">
+                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                  <Kanban className="text-fuchsia-400" /> Доска задач YouGile
+                </h2>
+                <div className="text-xs text-slate-400">Перемещайте карточки по колонкам или редактируйте их кликом</div>
               </div>
 
+              {/* Канбан колонки */}
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-4 pb-6 overflow-x-auto flex-1 items-start">
+                {kanbanColumns.map(col => {
+                  const colTasks = filteredTasks.filter(t => t.status === col.status);
+                  return (
+                    <div key={col.status} className="bg-slate-900/70 border border-slate-800 rounded-2xl flex flex-col max-h-[calc(100vh-200px)] shadow-lg">
+                      {/* Шапка колонки */}
+                      <div className={`p-4 border-b border-slate-800 flex justify-between items-center font-semibold text-xs rounded-t-2xl ${col.color}`}>
+                        <span>{col.title}</span>
+                        <span className="bg-slate-950 px-2 py-0.5 rounded-full font-mono text-[11px]">{colTasks.length}</span>
+                      </div>
+
+                      {/* Карточки задач */}
+                      <div className="p-3 space-y-3 overflow-y-auto flex-1">
+                        {colTasks.length === 0 ? (
+                          <div className="text-center py-8 text-xs text-slate-600 italic">Нет задач</div>
+                        ) : (
+                          colTasks.map(t => (
+                            <div 
+                              key={t.id} 
+                              className="bg-slate-950 border border-slate-800 hover:border-slate-700 p-3.5 rounded-xl space-y-2.5 shadow-sm transition-all group relative">
+                              <div className="flex justify-between items-start gap-2">
+                                <span className="text-[10px] font-semibold text-fuchsia-400 uppercase tracking-wider bg-fuchsia-500/10 px-2 py-0.5 rounded">
+                                  {t.project}
+                                </span>
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button onClick={() => handleEditTask(t)} className="text-slate-400 hover:text-fuchsia-400 p-0.5"><Edit3 size={13} /></button>
+                                  <button onClick={() => handleDeleteTask(t.id)} className="text-slate-500 hover:text-rose-400 p-0.5"><Trash2 size={13} /></button>
+                                </div>
+                              </div>
+
+                              <div className="text-xs font-medium text-slate-100 leading-snug">
+                                {t.name}
+                              </div>
+
+                              {/* Ответственные роли и сотрудники */}
+                              <div className="space-y-1 pt-1 border-t border-slate-900">
+                                {Array.isArray(t.roles) && t.roles.map((r, idx) => (
+                                  <div key={idx} className="text-[10px] text-slate-400 flex justify-between items-center">
+                                    <span className="text-fuchsia-300 font-medium">{r.role}:</span>
+                                    <span className="text-slate-300">{r.dev}</span>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Футер карточки с дедлайном и быстрым переносом */}
+                              <div className="pt-2 border-t border-slate-900 flex justify-between items-center text-[10px]">
+                                <span className="text-slate-400 font-mono">📅 {t.deadline}</span>
+                                <select 
+                                  value={t.status}
+                                  onChange={(e) => handleStatusChange(t.id, e.target.value)}
+                                  className="bg-slate-900 text-slate-300 border border-slate-700 rounded px-1.5 py-0.5 text-[10px] focus:outline-none focus:border-fuchsia-500">
+                                  <option value="Бэклог">Бэклог</option>
+                                  <option value="В работе">В работе</option>
+                                  <option value="Тестирование">Тестирование</option>
+                                  <option value="Удержание">Удержание</option>
+                                  <option value="Отмена">Отмена</option>
+                                  <option value="Выполнено">Выполнено</option>
+                                </select>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ТАБЛИЦА */}
+          {activeTab === 'dashboard' && (
+            <div className="space-y-6">
               <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
                 <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                  <h3 className="font-semibold text-lg text-slate-200">Реестр задач</h3>
+                  <h3 className="font-semibold text-lg text-slate-200">Реестр задач (План и Факт по ролям)</h3>
                   <span className="text-xs text-slate-400">Показано: {filteredTasks.length} из {tasks.length}</span>
                 </div>
                 <div className="overflow-x-auto">
@@ -526,6 +607,7 @@ export default function App() {
             </div>
           )}
 
+          {/* ГАНТ */}
           {activeTab === 'gantt' && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
               <div className="flex justify-between items-center border-b border-slate-800 pb-4">
@@ -538,16 +620,6 @@ export default function App() {
 
               <div className="overflow-x-auto pb-4">
                 <div className="min-w-[900px] space-y-4">
-                  <div className="grid grid-cols-12 gap-2 text-xs text-slate-400 font-mono border-b border-slate-800 pb-2 px-4">
-                    <div className="col-span-4">Задача / Проект</div>
-                    <div className="col-span-8 grid grid-cols-4 text-center">
-                      <span>Апрель 2026</span>
-                      <span>Май 2026</span>
-                      <span>Июнь - Июль</span>
-                      <span>Август 2026+</span>
-                    </div>
-                  </div>
-
                   {filteredTasks.map(t => {
                     const isDone = t.status === 'Выполнено';
                     return (
@@ -573,6 +645,7 @@ export default function App() {
             </div>
           )}
 
+          {/* АНАЛИТИКА */}
           {activeTab === 'analytics' && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
               <h3 className="text-lg font-semibold text-slate-200">Аналитика по разработчикам и загрузке команды</h3>
@@ -599,13 +672,14 @@ export default function App() {
             </div>
           )}
 
+          {/* ИИ АССИСТЕНТ */}
           {activeTab === 'ai' && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-[600px]">
               <div className="pb-4 border-b border-slate-800 flex items-center gap-3 shrink-0">
                 <div className="p-2.5 bg-fuchsia-600/10 text-fuchsia-400 rounded-xl border border-fuchsia-500/20"><Bot size={22} /></div>
                 <div>
-                  <h3 className="font-semibold text-slate-200">Умный ИИ Ассистент Проекта</h3>
-                  <p className="text-xs text-slate-400">Анализ всех {tasks.length} задач с учетом оценок и дат по ролям</p>
+                  <h3 className="font-semibold text-slate-200">Умный ИИ Ассистент YouGile</h3>
+                  <p className="text-xs text-slate-400">Анализ всех {tasks.length} задач с учетом доски YouGile</p>
                 </div>
               </div>
 
@@ -635,7 +709,7 @@ export default function App() {
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Задайте любой вопрос по проекту..."
+                  placeholder="Спросите 'Сделай отчет по доске'..."
                   className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-fuchsia-500"
                 />
                 <button type="submit" className="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-3 rounded-xl font-medium transition-all shadow-lg shadow-fuchsia-600/20 flex items-center justify-center">
@@ -647,6 +721,7 @@ export default function App() {
         </div>
       </main>
 
+      {/* МОДАЛЬНОЕ ОКНО СОЗДАНИЯ / РЕДАКТИРОВАНИЯ */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
@@ -658,7 +733,7 @@ export default function App() {
                   <input type="text" value={formData.project} onChange={(e) => setFormData({...formData, project: e.target.value})} required className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200" />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 font-medium">Статус</label>
+                  <label className="text-xs text-slate-400 font-medium">Статус (Колонка доски)</label>
                   <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})} className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200">
                     <option value="Бэклог">Бэклог</option>
                     <option value="В работе">В работе</option>
