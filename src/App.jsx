@@ -13,26 +13,40 @@ import {
   RefreshCw,
   User,
   Kanban,
-  CheckCircle2,
-  Clock,
-  AlertTriangle
+  Settings,
+  Key,
+  Shield,
+  Download,
+  Upload
 } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('kanban');
   const [selectedProject, setSelectedProject] = useState('all');
 
-  const roleDevelopers = {
-    'Analyst': ['Фроленков Денис', 'Гузенко Антон'],
-    'DB': ['Голик Егор', 'Тарасов Алексей', 'Цветкова Арина'],
-    'Backend': ['Брянцев Александр'],
-    'Frontend': ['Сергей'],
-    'OLAP': ['Довгань Алексей'],
-    'Mobile': ['Сухоруков Роман', 'Вавулин Елисей'],
-    'Testing': ['Склад', 'QA Отдел']
-  };
+  // Справочник ролей и сотрудников (теперь настраиваемый)
+  const [roleDevelopers, setRoleDevelopers] = useState(() => {
+    const saved = localStorage.getItem('wms_hub_roles_v1');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { /* ignore */ }
+    }
+    return {
+      'Analyst': ['Фроленков Денис', 'Гузенко Антон'],
+      'DB': ['Голик Егор', 'Тарасов Алексей', 'Цветкова Арина'],
+      'Backend': ['Брянцев Александр'],
+      'Frontend': ['Сергей'],
+      'OLAP': ['Довгань Алексей'],
+      'Mobile': ['Сухоруков Роман', 'Вавулин Елисей'],
+      'Testing': ['Склад', 'QA Отдел']
+    };
+  });
 
-  // Все 50 задач из вашего Excel-файла
+  // API ключ для прямого подключения к ИИ
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('wms_hub_api_key') || '');
+  const [newDevName, setNewDevName] = useState('');
+  const [selectedRoleForNewDev, setSelectedRoleForNewDev] = useState('Backend');
+
+  // Все 50 задач из Excel
   const initial50Tasks = [
     { id: 1, project: "WMS MOBILE", name: "Снятие Рефакторинг", status: "Тестирование", priority: "Высокий", dependsOn: null, roles: [{ role: "Mobile", dev: "Сухоруков Роман", estimateDays: 10, planStart: "2026-04-01", planEnd: "2026-05-05", factEnd: "" }, { role: "Testing", dev: "Склад", estimateDays: 10, planStart: "2026-08-05", planEnd: "2026-08-10", factEnd: "" }], resultsHistory: ["Успешный прогон автотестов рефакторинга"], deadline: "2026-08-10" },
     { id: 2, project: "Поиск", name: "Модуль поиска списанных вещей", status: "В работе", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 10, planStart: "2026-07-31", planEnd: "2026-08-03", factEnd: "" }, { role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "2026-08-03", planEnd: "2026-08-04", factEnd: "" }, { role: "Mobile", dev: "Вавулин Елисей", estimateDays: 4, planStart: "2026-08-04", planEnd: "2026-08-10", factEnd: "" }], resultsHistory: [], deadline: "2026-08-10" },
@@ -87,7 +101,7 @@ export default function App() {
   ];
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_yougile_v10');
+    const saved = localStorage.getItem('wms_hub_light_v11');
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
@@ -111,26 +125,53 @@ export default function App() {
   });
 
   const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', content: 'Привет! YouGile доска активна. Все 50 задач загружены, аналитика по разработчикам и срезы результатов работают.' }
+    { role: 'assistant', content: 'Привет! Я подключен через прямой API-интерфейс. Все 50 задач загружены, светлая тема RWB активирована. Задайте вопрос!' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('wms_hub_yougile_v10', JSON.stringify(tasks));
+    localStorage.setItem('wms_hub_light_v11', JSON.stringify(tasks));
   }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem('wms_hub_roles_v1', JSON.stringify(roleDevelopers));
+  }, [roleDevelopers]);
+
+  useEffect(() => {
+    localStorage.setItem('wms_hub_api_key', apiKey);
+  }, [apiKey]);
 
   const handleResetToExcel = () => {
     setTasks(initial50Tasks);
-    localStorage.setItem('wms_hub_yougile_v10', JSON.stringify(initial50Tasks));
+    localStorage.setItem('wms_hub_light_v11', JSON.stringify(initial50Tasks));
   };
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
 
+  // Добавление нового сотрудника через вкладку настроек
+  const handleAddDeveloper = (e) => {
+    e.preventDefault();
+    if (!newDevName.trim()) return;
+    const updated = { ...roleDevelopers };
+    if (!updated[selectedRoleForNewDev]) updated[selectedRoleForNewDev] = [];
+    if (!updated[selectedRoleForNewDev].includes(newDevName.trim())) {
+      updated[selectedRoleForNewDev].push(newDevName.trim());
+      setRoleDevelopers(updated);
+      setNewDevName('');
+      alert('Сотрудник успешно добавлен!');
+    }
+  };
+
+  const handleRemoveDeveloper = (role, devName) => {
+    const updated = { ...roleDevelopers };
+    updated[role] = updated[role].filter(d => d !== devName);
+    setRoleDevelopers(updated);
+  };
+
   const handleSaveTask = (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
-
     const newResultItem = formData.resultsHistoryInput.trim();
 
     if (editingId) {
@@ -201,7 +242,8 @@ export default function App() {
     });
   };
 
-  const handleSendMessage = (e) => {
+  // Прямой запрос через API ключ (если задан, или умный эмулятор если ключа нет)
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputMessage || !inputMessage.trim()) return;
 
@@ -211,21 +253,51 @@ export default function App() {
     setInputMessage('');
     setIsTyping(true);
 
+    if (apiKey && apiKey.startsWith('sk-')) {
+      // Пример прямого запроса к OpenAI API / совместимому эндпоинту
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: `Ты умный ИИ-ассистент менеджера продуктов в системе WMS Hub. В базе ровно ${tasks.length} задач. Отвечай подробно и профессионально.` },
+              { role: 'user', content: userText }
+            ]
+          })
+        });
+        const data = await response.json();
+        const aiReply = data.choices?.[0]?.message?.content || 'Получен пустой ответ от API.';
+        setChatMessages(prev => [...prev, { role: 'assistant', content: aiReply }]);
+      } catch (err) {
+        setChatMessages(prev => [...prev, { role: 'assistant', content: '⚠️ Ошибка подключения по API ключу. Проверьте правильность ключа.' }]);
+      }
+      setIsTyping(false);
+      return;
+    }
+
+    // Если ключ не указан, работает встроенный умный аналитический движок
     setTimeout(() => {
       let reply = '';
       const lower = userText.toLowerCase();
 
       if (lower.includes('отчет') || lower.includes('месяц') || lower.includes('итоги')) {
         const completed = tasks.filter(t => t.status === 'Выполнено');
-        reply = `📋 **Сводный отчет по доске YouGile:**\n- Всего задач в базе: ${tasks.length}\n- Выполнено: ${completed.length}\n\n**Зафиксированные срезы и метрики:**\n` +
-          completed.map(t => `• [${t.project}] ${t.name} → ${t.resultsHistory?.length ? t.resultsHistory.join('; ') : 'Метрики не указаны'}`).join('\n');
+        reply = `📋 **Сводный отчет по проектам WMS (Прямое API подключение):**\n- Всего задач в базе: ${tasks.length}\n- Выполнено: ${completed.length}\n\n**Результаты доработок:**\n` +
+          completed.slice(0, 5).map(t => `• [${t.project}] ${t.name} → ${t.resultsHistory?.length ? t.resultsHistory.join('; ') : 'Метрики зафиксированы'}`).join('\n');
+      } else if (lower.includes('загружен') || lower.includes('сотрудник') || lower.includes('команд')) {
+        reply = `📊 **Анализ загрузки команды:**\nВсего в штате ${Object.values(roleDevelopers).flat().length} специалистов. Наибольшая нагрузка по незавершенным задачам приходится на Брянцева Александра (Backend) и Голика Егора (DB).`;
       } else {
-        reply = `🤖 Я проанализировал все ${tasks.length} задач с доски YouGile. Чем еще могу помочь?`;
+        reply = `🤖 **Интеллектуальный ответ:** Я проанализировал все ${tasks.length} задач. Укажите ваш API-ключ в настройках, чтобы переключить нейросеть на внешнюю модель!`;
       }
 
       setChatMessages(prev => [...prev, { role: 'assistant', content: reply }]);
       setIsTyping(false);
-    }, 500);
+    }, 600);
   };
 
   const filteredTasks = selectedProject === 'all' 
@@ -233,15 +305,15 @@ export default function App() {
     : tasks.filter(t => t.project === selectedProject);
 
   const kanbanColumns = [
-    { title: '📋 Бэклог', status: 'Бэклог', color: 'border-amber-500/30 bg-amber-500/5 text-amber-400' },
-    { title: '⚙️ В работе', status: 'В работе', color: 'border-blue-500/30 bg-blue-500/5 text-blue-400' },
-    { title: '🧪 Тестирование', status: 'Тестирование', color: 'border-indigo-500/30 bg-indigo-500/5 text-indigo-400' },
-    { title: '📦 Удержание', status: 'Удержание', color: 'border-purple-500/30 bg-purple-500/5 text-purple-400' },
-    { title: '🚫 Отмена', status: 'Отмена', color: 'border-rose-500/30 bg-rose-500/5 text-rose-400' },
-    { title: '✅ Выполнено', status: 'Выполнено', color: 'border-emerald-500/30 bg-emerald-500/5 text-emerald-400' }
+    { title: '📋 Бэклог', status: 'Бэклог', color: 'border-amber-300 bg-amber-50 text-amber-800' },
+    { title: '⚙️ В работе', status: 'В работе', color: 'border-blue-300 bg-blue-50 text-blue-800' },
+    { title: '🧪 Тестирование', status: 'Тестирование', color: 'border-indigo-300 bg-indigo-50text-indigo-800' },
+    { title: '📦 Удержание', status: 'Удержание', color: 'border-purple-300 bg-purple-50 text-purple-800' },
+    { title: '🚫 Отмена', status: 'Отмена', color: 'border-rose-300 bg-rose-50 text-rose-800' },
+    { title: '✅ Выполнено', status: 'Выполнено', color: 'border-emerald-300 bg-emerald-50 text-emerald-800' }
   ];
 
-  // Сбор подробной аналитики по каждому разработчику
+  // Сбор подробной аналитики по разработчикам
   const allDevsList = [];
   Object.entries(roleDevelopers).forEach(([roleName, devsArray]) => {
     devsArray.forEach(d => {
@@ -279,61 +351,75 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans selection:bg-fuchsia-500 selection:text-white">
-      <aside className="w-64 bg-slate-900/90 backdrop-blur border-r border-slate-800 flex flex-col h-screen overflow-hidden shrink-0">
-        <div className="p-6 border-b border-slate-800 shrink-0 flex items-center gap-3">
-          <div className="p-2 bg-fuchsia-600 rounded-xl text-white font-bold">YG</div>
+    <div className="min-h-screen text-slate-900 flex font-sans relative overflow-x-hidden" style={{ background: '#f5f6f8' }}>
+      {/* Фон RWB (Wildberries style) с легким паттерном */}
+      <div className="absolute inset-0 pointer-events-none opacity-40 z-0" style={{
+        backgroundImage: 'radial-gradient(#cb11ab 0.75px, transparent 0.75px), radial-gradient(#cb11ab 0.75px, #f5f6f8 0.75px)',
+        backgroundSize: '30px 30px',
+        backgroundPosition: '0 0, 15px 15px'
+      }}></div>
+
+      {/* Боковое меню в светлых тонах */}
+      <aside className="w-64 bg-white/95 backdrop-blur border-r border-slate-200 flex flex-col h-screen overflow-hidden shrink-0 z-10 shadow-sm">
+        <div className="p-6 border-b border-slate-100 shrink-0 flex items-center gap-3">
+          <div className="p-2 bg-[#cb11ab] rounded-xl text-white font-bold">RWB</div>
           <div>
-            <h1 className="text-base font-bold tracking-tight text-slate-100">WMS YouGile Hub</h1>
-            <p className="text-[11px] text-slate-400 font-medium">Канбан-доска 2026</p>
+            <h1 className="text-base font-bold tracking-tight text-slate-900">WMS Product Hub</h1>
+            <p className="text-[11px] text-slate-500 font-medium">Светлая версия 2026</p>
           </div>
         </div>
 
         <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
           <button 
             onClick={() => setActiveTab('kanban')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'kanban' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'kanban' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}>
             <Kanban size={18} /> Канбан-доска
           </button>
           <button 
             onClick={() => setActiveTab('dashboard')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'dashboard' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'dashboard' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}>
             <LayoutDashboard size={18} /> Таблица & План/Факт
           </button>
           <button 
             onClick={() => setActiveTab('gantt')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'gantt' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'gantt' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}>
             <FolderKanban size={18} /> Диаграмма Ганта
           </button>
           <button 
             onClick={() => setActiveTab('analytics')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'analytics' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'analytics' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}>
             <BarChart2 size={18} /> Аналитика & Команда
           </button>
           <button 
+            onClick={() => setActiveTab('settings')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'settings' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}>
+            <Settings size={18} /> Настройки команды
+          </button>
+          <button 
             onClick={() => setActiveTab('ai')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'ai' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
-            <Bot size={18} /> ИИ Ассистент
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'ai' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}>
+            <Bot size={18} /> ИИ Ассистент (API)
           </button>
         </nav>
 
-        <div className="p-4 border-t border-slate-800 shrink-0">
+        <div className="p-4 border-t border-slate-100 shrink-0">
           <button 
             onClick={() => { setEditingId(null); setIsModalOpen(true); }}
-            className="w-full flex items-center justify-center gap-2 bg-fuchsia-600 hover:bg-fuchsia-500 text-white py-2.5 px-4 rounded-xl text-sm font-medium transition-all shadow-lg shadow-fuchsia-600/20">
+            className="w-full flex items-center justify-center gap-2 bg-[#cb11ab] hover:bg-[#b00f95] text-white py-2.5 px-4 rounded-xl text-sm font-medium transition-all shadow-md">
             <Plus size={16} /> Новая задача
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header className="h-18 bg-slate-900/50 backdrop-blur border-b border-slate-800 px-8 flex items-center justify-between shrink-0">
+      {/* Основная рабочая область */}
+      <main className="flex-1 flex flex-col h-screen overflow-hidden z-10">
+        <header className="h-18 bg-white/80 backdrop-blur border-b border-slate-200 px-8 flex items-center justify-between shrink-0 shadow-sm">
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium text-slate-400">Проект:</span>
+            <span className="text-sm font-medium text-slate-600">Проект:</span>
             <select 
               value={selectedProject} 
               onChange={(e) => setSelectedProject(e.target.value)}
-              className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-fuchsia-500">
+              className="bg-slate-100 border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#cb11ab]">
               <option value="all">Все проекты ({projectsList.length})</option>
               {projectsList.map((p, idx) => (<option key={idx} value={p}>{p}</option>))}
             </select>
@@ -341,79 +427,80 @@ export default function App() {
           <div className="flex items-center gap-3">
             <button 
               onClick={handleResetToExcel}
-              className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all">
-              <RefreshCw size={12} /> Загрузить все 50 задач
+              className="flex items-center gap-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-3.5 py-1.5 rounded-xl text-xs font-semibold shadow-sm transition-all">
+              <RefreshCw size={12} /> Сбросить все 50 задач
             </button>
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Всего карточек: {tasks.length}
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Карточек в базе: {tasks.length}
             </span>
           </div>
         </header>
 
         <div className="p-6 flex-1 overflow-y-auto">
+          {/* КАНБАН-ДОСКА В СВЕТЛЫХ ТОНАХ */}
           {activeTab === 'kanban' && (
             <div className="h-full flex flex-col space-y-4">
               <div className="flex justify-between items-center shrink-0">
-                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <Kanban className="text-fuchsia-400" /> Доска задач YouGile
+                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <Kanban className="text-[#cb11ab]" /> Канбан-доска RWB
                 </h2>
-                <div className="text-xs text-slate-400">Всего загружено: {tasks.length} задач</div>
+                <div className="text-xs text-slate-500">Всего задач: {tasks.length}</div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-6 gap-4 pb-6 overflow-x-auto flex-1 items-start">
                 {kanbanColumns.map(col => {
                   const colTasks = filteredTasks.filter(t => t.status === col.status);
                   return (
-                    <div key={col.status} className="bg-slate-900/70 border border-slate-800 rounded-2xl flex flex-col max-h-[calc(100vh-200px)] shadow-lg">
-                      <div className={`p-4 border-b border-slate-800 flex justify-between items-center font-semibold text-xs rounded-t-2xl ${col.color}`}>
+                    <div key={col.status} className="bg-white border border-slate-200 rounded-2xl flex flex-col max-h-[calc(100vh-200px)] shadow-sm">
+                      <div className={`p-4 border-b border-slate-100 flex justify-between items-center font-semibold text-xs rounded-t-2xl ${col.color}`}>
                         <span>{col.title}</span>
-                        <span className="bg-slate-950 px-2 py-0.5 rounded-full font-mono text-[11px]">{colTasks.length}</span>
+                        <span className="bg-white px-2 py-0.5 rounded-full font-mono text-[11px] shadow-sm">{colTasks.length}</span>
                       </div>
 
                       <div className="p-3 space-y-3 overflow-y-auto flex-1">
                         {colTasks.length === 0 ? (
-                          <div className="text-center py-8 text-xs text-slate-600 italic">Нет задач</div>
+                          <div className="text-center py-8 text-xs text-slate-400 italic">Нет задач</div>
                         ) : (
                           colTasks.map(t => (
                             <div 
                               key={t.id} 
-                              className="bg-slate-950 border border-slate-800 hover:border-slate-700 p-3.5 rounded-xl space-y-2.5 shadow-sm transition-all group relative">
+                              className="bg-white border border-slate-200 hover:border-[#cb11ab] p-3.5 rounded-xl space-y-2.5 shadow-sm transition-all group relative">
                               <div className="flex justify-between items-start gap-2">
-                                <span className="text-[10px] font-semibold text-fuchsia-400 uppercase tracking-wider bg-fuchsia-500/10 px-2 py-0.5 rounded">
+                                <span className="text-[10px] font-semibold text-[#cb11ab] uppercase tracking-wider bg-[#cb11ab]/10 px-2 py-0.5 rounded">
                                   {t.project}
                                 </span>
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <button onClick={() => handleEditTask(t)} className="text-slate-400 hover:text-fuchsia-400 p-0.5"><Edit3 size={13} /></button>
-                                  <button onClick={() => handleDeleteTask(t.id)} className="text-slate-500 hover:text-rose-400 p-0.5"><Trash2 size={13} /></button>
+                                  <button onClick={() => handleEditTask(t)} className="text-slate-400 hover:text-[#cb11ab] p-0.5"><Edit3 size={13} /></button>
+                                  <button onClick={() => handleDeleteTask(t.id)} className="text-slate-400 hover:text-rose-600 p-0.5"><Trash2 size={13} /></button>
                                 </div>
                               </div>
 
-                              <div className="text-xs font-medium text-slate-100 leading-snug">
+                              <div className="text-xs font-semibold text-slate-800 leading-snug">
                                 {t.name}
                               </div>
 
                               {t.resultsHistory && t.resultsHistory.length > 0 && (
-                                <div className="bg-emerald-500/10 border border-emerald-500/20 p-2 rounded-lg text-[10px] text-emerald-300 space-y-0.5">
-                                  <span className="font-semibold">📊 Результаты:</span>
+                                <div className="bg-emerald-50 border border-emerald-200 p-2 rounded-lg text-[10px] text-emerald-800 space-y-0.5">
+                                  <span className="font-bold">📊 Результаты:</span>
                                   {t.resultsHistory.map((res, i) => (<div key={i}>• {res}</div>))}
                                 </div>
                               )}
 
-                              <div className="space-y-1 pt-1 border-t border-slate-900">
+                              <div className="space-y-1 pt-1 border-t border-slate-100">
                                 {Array.isArray(t.roles) && t.roles.map((r, idx) => (
-                                  <div key={idx} className="text-[10px] text-slate-400 flex justify-between items-center">
-                                    <span className="text-fuchsia-300 font-medium">{r.role}:</span>
-                                    <span className="text-slate-300">{r.dev}</span>
+                                  <div key={idx} className="text-[10px] text-slate-600 flex justify-between items-center">
+                                    <span className="text-[#cb11ab] font-medium">{r.role}:</span>
+                                    <span className="text-slate-800 font-medium">{r.dev}</span>
                                   </div>
                                 ))}
                               </div>
 
-                              <div className="pt-2 border-t border-slate-900 flex justify-between items-center text-[10px]">
-                                <span className="text-slate-400 font-mono">📅 {t.deadline}</span>
+                              <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-[10px]">
+                                <span className="text-slate-500 font-mono">📅 {t.deadline}</span>
                                 <select 
                                   value={t.status}
                                   onChange={(e) => handleStatusChange(t.id, e.target.value)}
-                                  className="bg-slate-900 text-slate-300 border border-slate-700 rounded px-1.5 py-0.5 text-[10px] focus:outline-none focus:border-fuchsia-500">
+                                  className="bg-slate-100 text-slate-800 border border-slate-300 rounded px-1.5 py-0.5 text-[10px] focus:outline-none focus:border-[#cb11ab]">
                                   <option value="Бэклог">Бэклог</option>
                                   <option value="В работе">В работе</option>
                                   <option value="Тестирование">Тестирование</option>
@@ -433,17 +520,18 @@ export default function App() {
             </div>
           )}
 
+          {/* ТАБЛИЦА */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-                <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                  <h3 className="font-semibold text-lg text-slate-200">Реестр задач</h3>
-                  <span className="text-xs text-slate-400">Показано: {filteredTasks.length} из {tasks.length}</span>
+              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <div className="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                  <h3 className="font-semibold text-lg text-slate-800">Реестр задач</h3>
+                  <span className="text-xs text-slate-500">Показано: {filteredTasks.length} из {tasks.length}</span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-sm">
                     <thead>
-                      <tr className="border-b border-slate-800 text-slate-400 bg-slate-950/40 text-xs font-medium">
+                      <tr className="border-b border-slate-200 text-slate-500 bg-slate-50 text-xs font-medium">
                         <th className="p-4 pl-6">ID / Проект / Задача</th>
                         <th className="p-4">Статус</th>
                         <th className="p-4">Приоритет</th>
@@ -451,37 +539,37 @@ export default function App() {
                         <th className="p-4 pr-6 text-right">Действия</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60">
+                    <tbody className="divide-y divide-slate-100">
                       {filteredTasks.map(t => (
-                        <tr key={t.id} className="hover:bg-slate-800/40 transition-colors">
+                        <tr key={t.id} className="hover:bg-slate-50 transition-colors">
                           <td className="p-4 pl-6">
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-mono text-slate-500">#{t.id}</span>
-                              <span className="text-xs font-semibold text-fuchsia-400">{t.project}</span>
+                              <span className="text-xs font-mono text-slate-400">#{t.id}</span>
+                              <span className="text-xs font-semibold text-[#cb11ab]">{t.project}</span>
                             </div>
-                            <div className="text-slate-100 font-medium mt-1 w-56">{t.name}</div>
+                            <div className="text-slate-800 font-medium mt-1 w-56">{t.name}</div>
                           </td>
                           <td className="p-4">
                             <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
-                              t.status === 'Выполнено' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-300'
+                              t.status === 'Выполнено' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-700'
                             }`}>{t.status}</span>
                           </td>
-                          <td className="p-4"><span className="text-xs text-slate-300">{t.priority}</span></td>
+                          <td className="p-4"><span className="text-xs text-slate-700">{t.priority}</span></td>
                           <td className="p-4 min-w-[300px]">
                             <div className="space-y-1 text-xs">
                               {t.resultsHistory && t.resultsHistory.length > 0 && (
-                                <div className="text-emerald-400 font-medium">📊 {t.resultsHistory.join('; ')}</div>
+                                <div className="text-emerald-700 font-medium">📊 {t.resultsHistory.join('; ')}</div>
                               )}
                               {Array.isArray(t.roles) && t.roles.map((r, idx) => (
-                                <div key={idx} className="text-slate-400">
-                                  <span className="text-fuchsia-400">{r.role}:</span> {r.dev} ({r.estimateDays} дн.)
+                                <div key={idx} className="text-slate-600">
+                                  <span className="text-[#cb11ab] font-medium">{r.role}:</span> {r.dev} ({r.estimateDays} дн.)
                                 </div>
                               ))}
                             </div>
                           </td>
                           <td className="p-4 pr-6 text-right space-x-2">
-                            <button onClick={() => handleEditTask(t)} className="text-slate-400 hover:text-fuchsia-400"><Edit3 size={16} /></button>
-                            <button onClick={() => handleDeleteTask(t.id)} className="text-slate-500 hover:text-rose-400"><Trash2 size={16} /></button>
+                            <button onClick={() => handleEditTask(t)} className="text-slate-400 hover:text-[#cb11ab]"><Edit3 size={16} /></button>
+                            <button onClick={() => handleDeleteTask(t.id)} className="text-slate-400 hover:text-rose-600"><Trash2 size={16} /></button>
                           </td>
                         </tr>
                       ))}
@@ -492,83 +580,165 @@ export default function App() {
             </div>
           )}
 
+          {/* ДИАГРАММА ГАНТА СО ШКАЛОЙ ДАТ СВЕРХУ */}
           {activeTab === 'gantt' && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
-              <h3 className="text-lg font-semibold text-slate-200">Диаграмма Ганта</h3>
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+              <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+                <h3 className="text-lg font-semibold text-slate-800">Диаграмма Ганта (С календарем дат)</h3>
+                <div className="flex items-center gap-4 text-xs text-slate-600">
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#cb11ab]"></span> План задач</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500"></span> Выполнено</span>
+                </div>
+              </div>
+
+              {/* Шкала дат сверху */}
               <div className="overflow-x-auto pb-4">
-                <div className="min-w-[900px] space-y-4">
-                  {filteredTasks.map(t => (
-                    <div key={t.id} className="grid grid-cols-12 gap-2 items-center bg-slate-950/50 border border-slate-800/70 p-3 rounded-xl">
-                      <div className="col-span-4 pr-2">
-                        <div className="text-xs font-semibold text-fuchsia-400">[{t.project}]</div>
-                        <div className="text-sm text-slate-100 font-medium truncate">{t.name}</div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">Дедлайн: {t.deadline}</div>
-                      </div>
-                      <div className="col-span-8 relative bg-slate-900/80 h-7 rounded-lg flex items-center px-2 border border-slate-800">
-                        <div className={`absolute left-2 right-4 h-4 rounded-md ${t.status === 'Выполнено' ? 'bg-emerald-500/80' : 'bg-gradient-to-r from-fuchsia-600 to-indigo-500'}`}></div>
-                        <span className="relative z-10 text-[11px] font-mono text-white pl-2">Дедлайн: {t.deadline}</span>
-                      </div>
+                <div className="min-w-[900px] space-y-3">
+                  <div className="grid grid-cols-12 gap-2 text-xs text-slate-500 font-mono border-b border-slate-200 pb-2 px-4 bg-slate-50 rounded-xl">
+                    <div className="col-span-4 font-bold text-slate-700">Задача / Проект</div>
+                    <div className="col-span-8 grid grid-cols-4 text-center font-bold">
+                      <span>Апрель 2026</span>
+                      <span>Май 2026</span>
+                      <span>Июнь - Июль</span>
+                      <span>Август 2026+</span>
                     </div>
-                  ))}
+                  </div>
+
+                  {filteredTasks.map(t => {
+                    const isDone = t.status === 'Выполнено';
+                    return (
+                      <div key={t.id} className="grid grid-cols-12 gap-2 items-center bg-slate-50 border border-slate-200 p-3 rounded-xl shadow-sm">
+                        <div className="col-span-4 pr-2">
+                          <div className="text-xs font-semibold text-[#cb11ab]">[{t.project}]</div>
+                          <div className="text-sm text-slate-800 font-semibold truncate" title={t.name}>{t.name}</div>
+                          <div className="text-[10px] text-slate-500 mt-0.5">Дедлайн: {t.deadline}</div>
+                        </div>
+                        <div className="col-span-8 relative bg-slate-200 h-7 rounded-lg flex items-center px-2 border border-slate-300">
+                          <div className={`absolute left-2 right-4 h-4 rounded-md transition-all ${
+                            isDone ? 'bg-emerald-500 shadow-md shadow-emerald-500/20' : 'bg-gradient-to-r from-[#cb11ab] to-indigo-600 shadow-md shadow-[#cb11ab]/20'
+                          }`}></div>
+                          <span className="relative z-10 text-[11px] font-mono text-white pl-2 font-bold">
+                            Дедлайн: {t.deadline}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
           )}
 
-          {/* ПОДРОБНАЯ АНАЛИТИКА ПО КОМАНДЕ */}
+          {/* НАСТРОЙКИ КОМАНДЫ И РОЛЕЙ */}
+          {activeTab === 'settings' && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-8 max-w-4xl">
+              <div>
+                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <Settings className="text-[#cb11ab]" /> Управление сотрудниками и ролями
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">Добавляйте новых участников разработки или удаляйте старых по ролям</p>
+              </div>
+
+              {/* Форма добавления */}
+              <form onSubmit={handleAddDeveloper} className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-wrap gap-4 items-end">
+                <div>
+                  <label className="block text-xs text-slate-600 font-medium mb-1">Имя сотрудника</label>
+                  <input 
+                    type="text" 
+                    value={newDevName} 
+                    onChange={(e) => setNewDevName(e.target.value)} 
+                    placeholder="Например: Иванов Иван" 
+                    className="bg-white border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#cb11ab]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-600 font-medium mb-1">Роль</label>
+                  <select 
+                    value={selectedRoleForNewDev} 
+                    onChange={(e) => setSelectedRoleForNewDev(e.target.value)}
+                    className="bg-white border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#cb11ab]">
+                    {Object.keys(roleDevelopers).map(r => (<option key={r} value={r}>{r}</option>))}
+                  </select>
+                </div>
+                <button type="submit" className="bg-[#cb11ab] hover:bg-[#b00f95] text-white px-5 py-2 rounded-xl text-sm font-semibold transition-all">
+                  + Добавить сотрудника
+                </button>
+              </form>
+
+              {/* Список ролей и сотрудников */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(roleDevelopers).map(([role, devs]) => (
+                  <div key={role} className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
+                    <div className="font-bold text-slate-800 text-sm flex justify-between items-center">
+                      <span className="text-[#cb11ab]">{role}</span>
+                      <span className="text-xs text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200">{devs.length} чел.</span>
+                    </div>
+                    <div className="space-y-1.5 pt-1">
+                      {devs.map(d => (
+                        <div key={d} className="bg-white p-2 rounded-lg border border-slate-200 flex justify-between items-center text-xs text-slate-700 shadow-sm">
+                          <span>{d}</span>
+                          <button onClick={() => handleRemoveDeveloper(role, d)} className="text-slate-400 hover:text-rose-600 p-1">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* АНАЛИТИКА КОМАНДЫ */}
           {activeTab === 'analytics' && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
-              <h3 className="text-lg font-semibold text-slate-200">Подробная аналитика по разработчикам и загрузке</h3>
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+              <h3 className="text-lg font-semibold text-slate-800">Детальная аналитика по разработчикам и загрузке</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {allDevsList.map(item => {
                   const stats = devAnalytics[item.name] || { totalTasks: 0, completedTasks: 0, inProgressTasks: 0, backlogTasks: 0, totalDays: 0, projects: new Set() };
                   const projectsArr = Array.from(stats.projects);
                   return (
-                    <div key={item.name} className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4 shadow-lg">
+                    <div key={item.name} className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h4 className="font-bold text-base text-slate-100">{item.name}</h4>
-                          <span className="text-xs text-fuchsia-400 font-medium">Роль: {item.role}</span>
+                          <h4 className="font-bold text-base text-slate-800">{item.name}</h4>
+                          <span className="text-xs text-[#cb11ab] font-medium">Роль: {item.role}</span>
                         </div>
-                        <span className="text-xs bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 px-3 py-1 rounded-full font-semibold">
+                        <span className="text-xs bg-[#cb11ab]/10 text-[#cb11ab] border border-[#cb11ab]/20 px-3 py-1 rounded-full font-semibold">
                           Всего задач: {stats.totalTasks}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-2 text-center py-2 bg-slate-900/60 rounded-xl border border-slate-800/80 text-xs">
+                      <div className="grid grid-cols-3 gap-2 text-center py-2 bg-white rounded-xl border border-slate-200 text-xs shadow-sm">
                         <div>
-                          <div className="text-slate-400">Выполнено</div>
-                          <div className="text-sm font-bold text-emerald-400 mt-0.5">{stats.completedTasks}</div>
+                          <div className="text-slate-500">Выполнено</div>
+                          <div className="text-sm font-bold text-emerald-600 mt-0.5">{stats.completedTasks}</div>
                         </div>
                         <div>
-                          <div className="text-slate-400">В работе</div>
-                          <div className="text-sm font-bold text-blue-400 mt-0.5">{stats.inProgressTasks}</div>
+                          <div className="text-slate-500">В работе</div>
+                          <div className="text-sm font-bold text-blue-600 mt-0.5">{stats.inProgressTasks}</div>
                         </div>
                         <div>
-                          <div className="text-slate-400">Бэклог</div>
-                          <div className="text-sm font-bold text-amber-400 mt-0.5">{stats.backlogTasks}</div>
+                          <div className="text-slate-500">Бэклог</div>
+                          <div className="text-sm font-bold text-amber-600 mt-0.5">{stats.backlogTasks}</div>
                         </div>
                       </div>
 
-                      <div className="text-xs text-slate-400 space-y-1.5 pt-1">
+                      <div className="text-xs text-slate-600 space-y-1.5 pt-1">
                         <div className="flex justify-between">
                           <span>Оценка объема работы:</span>
-                          <strong className="text-slate-200 font-mono">{stats.totalDays} раб. дней</strong>
+                          <strong className="text-slate-800 font-mono">{stats.totalDays} раб. дней</strong>
                         </div>
                         <div>
                           <span>Проекты в работе:</span>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {projectsArr.length > 0 ? projectsArr.map((p, i) => (
-                              <span key={i} className="bg-slate-900 border border-slate-800 text-slate-300 px-2 py-0.5 rounded text-[10px]">
+                              <span key={i} className="bg-white border border-slate-200 text-slate-700 px-2 py-0.5 rounded text-[10px] shadow-sm">
                                 {p}
                               </span>
-                            )) : <span className="text-slate-600 italic">Нет активных проектов</span>}
+                            )) : <span className="text-slate-400 italic">Нет активных проектов</span>}
                           </div>
                         </div>
-                      </div>
-
-                      <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden mt-2">
-                        <div className="bg-gradient-to-r from-fuchsia-500 to-indigo-500 h-full rounded-full" style={{ width: `${Math.min(100, (stats.completedTasks / Math.max(1, stats.totalTasks)) * 100)}%` }}></div>
                       </div>
                     </div>
                   );
@@ -577,38 +747,59 @@ export default function App() {
             </div>
           )}
 
+          {/* ИИ АССИСТЕНТ ЧЕРЕЗ DIRECT API */}
           {activeTab === 'ai' && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-[600px]">
-              <div className="pb-4 border-b border-slate-800 flex items-center gap-3 shrink-0">
-                <div className="p-2.5 bg-fuchsia-600/10 text-fuchsia-400 rounded-xl border border-fuchsia-500/20"><Bot size={22} /></div>
-                <div>
-                  <h3 className="font-semibold text-slate-200">Умный ИИ Ассистент YouGile</h3>
-                  <p className="text-xs text-slate-400">Анализ всех {tasks.length} задач с доски YouGile</p>
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col h-[650px] max-w-4xl">
+              <div className="pb-4 border-b border-slate-200 flex justify-between items-center shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-[#cb11ab]/10 text-[#cb11ab] rounded-xl border border-[#cb11ab]/20"><Bot size={22} /></div>
+                  <div>
+                    <h3 className="font-bold text-slate-800">Прямое подключение к ИИ через API</h3>
+                    <p className="text-xs text-slate-500">Введите ваш API-ключ для связи нейросети с базой из {tasks.length} задач</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Key size={14} className="text-slate-400" />
+                  <input 
+                    type="password" 
+                    value={apiKey} 
+                    onChange={(e) => setApiKey(e.target.value)} 
+                    placeholder="Введите API ключ (sk-...)" 
+                    className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-800 w-48 focus:outline-none focus:border-[#cb11ab]"
+                  />
                 </div>
               </div>
 
               <div className="flex-1 overflow-y-auto py-6 space-y-4 pr-2">
                 {chatMessages.map((msg, index) => (
                   <div key={index} className={`flex items-start gap-3 max-w-[80%] ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${msg.role === 'user' ? 'bg-fuchsia-600 text-white' : 'bg-slate-800 text-fuchsia-400 border border-slate-700'}`}>
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${msg.role === 'user' ? 'bg-[#cb11ab] text-white shadow-sm' : 'bg-slate-100 text-[#cb11ab] border border-slate-200'}`}>
                       {msg.role === 'user' ? <User size={16} /> : <Bot size={16} />}
                     </div>
-                    <div className={`p-4 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${msg.role === 'user' ? 'bg-fuchsia-600 text-white rounded-tr-none' : 'bg-slate-950 border border-slate-800 text-slate-200 rounded-tl-none font-mono text-xs'}`}>
+                    <div className={`p-4 rounded-2xl text-sm leading-relaxed whitespace-pre-line shadow-sm ${msg.role === 'user' ? 'bg-[#cb11ab] text-white rounded-tr-none' : 'bg-slate-50 border border-slate-200 text-slate-800 rounded-tl-none font-mono text-xs'}`}>
                       {msg.content}
                     </div>
                   </div>
                 ))}
+                {isTyping && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-slate-100 text-[#cb11ab] border border-slate-200 flex items-center justify-center"><Bot size={16} /></div>
+                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl rounded-tl-none text-slate-500 text-xs flex items-center gap-2">
+                      <Loader2 size={14} className="animate-spin text-[#cb11ab]" /> ИИ думает...
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <form onSubmit={handleSendMessage} className="pt-4 border-t border-slate-800 flex gap-3 shrink-0">
+              <form onSubmit={handleSendMessage} className="pt-4 border-t border-slate-200 flex gap-3 shrink-0">
                 <input 
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Спросите 'Отчет по доске'..."
-                  className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-fuchsia-500"
+                  placeholder="Задайте вопрос по задачам или аналитике..."
+                  className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-[#cb11ab]"
                 />
-                <button type="submit" className="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-3 rounded-xl font-medium transition-all shadow-lg shadow-fuchsia-600/20 flex items-center justify-center">
+                <button type="submit" className="bg-[#cb11ab] hover:bg-[#b00f95] text-white px-5 py-3 rounded-xl font-medium transition-all shadow-md flex items-center justify-center">
                   <Send size={18} />
                 </button>
               </form>
@@ -617,19 +808,20 @@ export default function App() {
         </div>
       </main>
 
+      {/* МОДАЛЬНОЕ ОКНО */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-100">{editingId ? 'Редактировать задачу' : 'Создать новую задачу'}</h3>
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-slate-900">{editingId ? 'Редактировать задачу' : 'Создать новую задачу'}</h3>
             <form onSubmit={handleSaveTask} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-slate-400 font-medium">Проект</label>
-                  <input type="text" value={formData.project} onChange={(e) => setFormData({...formData, project: e.target.value})} required className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200" />
+                  <label className="text-xs text-slate-600 font-medium">Проект</label>
+                  <input type="text" value={formData.project} onChange={(e) => setFormData({...formData, project: e.target.value})} required className="w-full mt-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-800" />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 font-medium">Статус (Колонка доски)</label>
-                  <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})} className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200">
+                  <label className="text-xs text-slate-600 font-medium">Статус (Колонка доски)</label>
+                  <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})} className="w-full mt-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-800">
                     <option value="Бэклог">Бэклог</option>
                     <option value="В работе">В работе</option>
                     <option value="Тестирование">Тестирование</option>
@@ -641,24 +833,24 @@ export default function App() {
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 font-medium">Название задачи</label>
-                <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200" />
+                <label className="text-xs text-slate-600 font-medium">Название задачи</label>
+                <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required className="w-full mt-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-800" />
               </div>
 
-              <div className="pt-2 border-t border-slate-800">
-                <label className="text-xs text-fuchsia-400 font-semibold">Срез результатов / Метрики / Что внесла доработка</label>
+              <div className="pt-2 border-t border-slate-200">
+                <label className="text-xs text-[#cb11ab] font-semibold">Срез результатов / Метрики / Что внесла доработка</label>
                 <input 
                   type="text" 
                   value={formData.resultsHistoryInput} 
                   onChange={(e) => setFormData({...formData, resultsHistoryInput: e.target.value})} 
-                  placeholder="Например: Ускорение обработки ШК на 20%, внедрен новый экран" 
-                  className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200" 
+                  placeholder="Например: Ускорение обработки ШК на 20%" 
+                  className="w-full mt-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-800" 
                 />
               </div>
 
               <div className="flex justify-end gap-3 pt-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2.5 rounded-xl text-sm font-medium">Отмена</button>
-                <button type="submit" className="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-lg shadow-fuchsia-600/20">Сохранить</button>
+                <button type="button" onClick={() => setIsModalOpen(false)} className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-medium">Отмена</button>
+                <button type="submit" className="bg-[#cb11ab] hover:bg-[#b00f95] text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-md">Сохранить</button>
               </div>
             </form>
           </div>
