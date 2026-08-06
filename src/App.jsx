@@ -13,9 +13,7 @@ import {
   RefreshCw,
   User,
   Kanban,
-  Settings,
-  AlertTriangle,
-  CheckCircle2
+  Settings
 } from 'lucide-react';
 
 export default function App() {
@@ -95,7 +93,7 @@ export default function App() {
   ];
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_light_v18');
+    const saved = localStorage.getItem('wms_hub_light_v19');
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
@@ -108,7 +106,6 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  // Полные поля для создания/редактирования задачи
   const [formData, setFormData] = useState({
     project: 'WMS MOBILE',
     name: '',
@@ -121,13 +118,13 @@ export default function App() {
   });
 
   const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', content: 'Привет! Я полноценный ИИ-ассистент WMS Hub. Я умею искать просрочки, анализировать проекты, а также **создавать задачи в бэклог по вашему текстовому запросу** (например: "Создай задачу: Новый алгоритм шлюзования, проект Снятие, приоритет высокий"). Спрашивайте!' }
+    { role: 'assistant', content: 'Привет! Я ИИ-ассистент WMS Hub. Спрашивайте про просрочки, проекты, загрузку или напишите "Создай задачу: [название]", и я добавлю её в бэклог!' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('wms_hub_light_v18', JSON.stringify(tasks));
+    localStorage.setItem('wms_hub_light_v19', JSON.stringify(tasks));
   }, [tasks]);
 
   useEffect(() => {
@@ -136,7 +133,7 @@ export default function App() {
 
   const handleResetToExcel = () => {
     setTasks(initial50Tasks);
-    localStorage.setItem('wms_hub_light_v18', JSON.stringify(initial50Tasks));
+    localStorage.setItem('wms_hub_light_v19', JSON.stringify(initial50Tasks));
   };
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
@@ -235,7 +232,7 @@ export default function App() {
     });
   };
 
-  // Умный ИИ с поиском просрочек и возможностью создания задач через чат
+  // Полноценный ИИ с автосозданием в бэклог, поиском просрочек и анализом проектов
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputMessage || !inputMessage.trim()) return;
@@ -249,11 +246,9 @@ export default function App() {
     setTimeout(() => {
       let reply = '';
       const lower = userText.toLowerCase();
-      const currentDate = '2026-08-06'; // текущая дата по контексту
+      const currentDate = '2026-08-06';
 
-      // Команда создания задачи через ИИ
       if (lower.includes('создай задачу') || lower.includes('добавь задачу') || lower.includes('новая задача')) {
-        // Пробуем извлечь название
         let taskName = userText.replace(/создай задачу|добавь задачу|новая задача/gi, '').trim();
         taskName = taskName.replace(/проект\s*[:\-]?\s*[\w\s]+/gi, '').trim();
         if (!taskName) taskName = 'Новая задача от ИИ';
@@ -283,16 +278,11 @@ export default function App() {
         reply = `✅ **Задача успешно создана и помещена в Бэклог!**\n- **Проект:** ${detectedProject}\n- **Название:** ${taskName}\n- **Приоритет:** ${detectedPriority}\n- **Статус:** Бэклог`;
       } 
       else if (lower.includes('просроч') || lower.includes('горящ') || lower.includes('дедлайн')) {
-        // Поиск задач у которых дедлайн меньше текущей даты 2026-08-06 и статус не выполнен
         const overdue = tasks.filter(t => t.status !== 'Выполнено' && t.deadline && t.deadline < currentDate);
         reply = `⚠️ **Анализ просрочек и дедлайнов (текущая дата: ${currentDate}):**\n` +
           (overdue.length > 0 
             ? overdue.map(t => `• [${t.project}] **${t.name}** (Дедлайн: ${t.deadline}, Статус: ${t.status})`).join('\n')
             : '🎉 Отличные новости! Просроченных задач по текущему плану не обнаружено.');
-      } 
-      else if (lower.includes('времени') || lower.includes('час') || lower.includes('дата')) {
-        const now = new Date();
-        reply = `🕒 Текущее системное время: **${now.toLocaleTimeString()}** (${now.toLocaleDateString()}).`;
       } 
       else if (lower.includes('проект') || lower.includes('снятие') || lower.includes('мобайл') || lower.includes('поиск') || lower.includes('инвентариз')) {
         const found = tasks.filter(t => t.project.toLowerCase().includes(lower) || t.name.toLowerCase().includes(lower));
@@ -301,7 +291,7 @@ export default function App() {
       } 
       else if (lower.includes('загружен') || lower.includes('кто') || lower.includes('разработчик') || lower.includes('команд')) {
         reply = `📊 **Анализ загрузки команды WMS Hub:**\n` +
-          `• **Брянцев Александр (Backend):** Основная нагрузка по бэкенду (поиск, инвентаризация).\n` +
+          `• **Брянцев Александр (Backend):** Задействован в максимальном числе задач (поиск, инвентаризация).\n` +
           `• **Голик Егор (DB):** Модули БД, SQL-запросы, валидация.\n` +
           `• **Сухоруков Роман (Mobile):** Мобильный рефакторинг.`;
       } 
@@ -376,7 +366,6 @@ export default function App() {
         backgroundPosition: '0 0, 15px 15px'
       }}></div>
 
-      {/* Боковое меню */}
       <aside className="w-64 bg-white/95 backdrop-blur border-r border-slate-200 flex flex-col h-screen overflow-hidden shrink-0 z-10 shadow-sm">
         <div className="p-6 border-b border-slate-100 shrink-0 flex items-center gap-3">
           <div className="p-2 bg-[#cb11ab] rounded-xl text-white font-bold">RWB</div>
@@ -811,11 +800,11 @@ export default function App() {
         </div>
       </main>
 
-      {/* ПОЛНОЦЕННОЕ МОДАЛЬНОЕ ОКНО СОЗДАНИЯ И РЕДАКТИРОВАНИЯ ЗАДАЧИ */}
+      {/* МОДАЛЬНОЕ ОКНО СОЗДАНИЯ И РЕДАКТИРОВАНИЯ ЗАДАЧИ С ДАТАМИ ПЛАН/ФАКТ И РОЛЯМИ */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-900">{editingId ? 'Редактировать задачу' : 'Создать новую задачу в бэклоге'}</h3>
+            <h3 className="text-lg font-bold text-slate-900">{editingId ? 'Редактировать задачу' : 'Создать новую задачу в бэклог'}</h3>
             <form onSubmit={handleSaveTask} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -856,42 +845,63 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Настройка ролей и сотрудников */}
               <div className="space-y-3 pt-2 border-t border-slate-200">
                 <div className="flex justify-between items-center">
-                  <label className="text-xs text-[#cb11ab] font-semibold">Участники, роли и оценки (дни/даты)</label>
+                  <label className="text-xs text-[#cb11ab] font-semibold">Участники, роли, плановые и фактические даты</label>
                   <button type="button" onClick={handleAddRoleRow} className="text-xs bg-[#cb11ab]/10 text-[#cb11ab] px-2.5 py-1 rounded-lg border border-[#cb11ab]/20 hover:bg-[#cb11ab]/20">
                     + Добавить роль
                   </button>
                 </div>
                 {formData.roles.map((r, idx) => (
-                  <div key={idx} className="grid grid-cols-1 md:grid-cols-5 gap-2 items-center bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <select value={r.role} onChange={(e) => {
-                      const role = e.target.value;
-                      const dev = roleDevelopers[role]?.[0] || '';
-                      setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, role, dev } : item)});
-                    }} className="bg-white border border-slate-300 rounded-lg p-1.5 text-xs text-slate-800">
-                      {Object.keys(roleDevelopers).map(role => (<option key={role} value={role}>{role}</option>))}
-                    </select>
+                  <div key={idx} className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <select value={r.role} onChange={(e) => {
+                        const role = e.target.value;
+                        const dev = roleDevelopers[role]?.[0] || '';
+                        setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, role, dev } : item)});
+                      }} className="bg-white border border-slate-300 rounded-lg p-1.5 text-xs text-slate-800">
+                        {Object.keys(roleDevelopers).map(role => (<option key={role} value={role}>{role}</option>))}
+                      </select>
 
-                    <select value={r.dev} onChange={(e) => {
-                      const dev = e.target.value;
-                      setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, dev } : item)});
-                    }} className="bg-white border border-slate-300 rounded-lg p-1.5 text-xs text-slate-800">
-                      {(roleDevelopers[r.role] || []).map(dev => (<option key={dev} value={dev}>{dev}</option>))}
-                    </select>
+                      <select value={r.dev} onChange={(e) => {
+                        const dev = e.target.value;
+                        setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, dev } : item)});
+                      }} className="bg-white border border-slate-300 rounded-lg p-1.5 text-xs text-slate-800">
+                        {(roleDevelopers[r.role] || []).map(dev => (<option key={dev} value={dev}>{dev}</option>))}
+                      </select>
 
-                    <input type="number" placeholder="Дней" value={r.estimateDays} onChange={(e) => {
-                      const estimateDays = Number(e.target.value);
-                      setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, estimateDays } : item)});
-                    }} className="bg-white border border-slate-300 rounded-lg p-1.5 text-xs text-slate-800" title="Оценка в днях" />
+                      <input type="number" placeholder="Оценка (дней)" value={r.estimateDays} onChange={(e) => {
+                        const estimateDays = Number(e.target.value);
+                        setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, estimateDays } : item)});
+                      }} className="bg-white border border-slate-300 rounded-lg p-1.5 text-xs text-slate-800" />
+                    </div>
 
-                    <input type="date" value={r.planStart || ''} onChange={(e) => {
-                      const planStart = e.target.value;
-                      setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, planStart } : item)});
-                    }} className="bg-white border border-slate-300 rounded-lg p-1.5 text-xs text-slate-800" title="План старта" />
-
-                    <button type="button" onClick={() => handleRemoveRoleRow(idx)} className="text-rose-600 hover:text-rose-700 text-xs text-center">Удалить</button>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px] text-slate-600 items-center pt-1">
+                      <div>
+                        <span>План старт:</span>
+                        <input type="date" value={r.planStart || ''} onChange={(e) => {
+                          const planStart = e.target.value;
+                          setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, planStart } : item)});
+                        }} className="w-full bg-white border border-slate-300 rounded p-1 text-[11px] mt-0.5" />
+                      </div>
+                      <div>
+                        <span>План финиш:</span>
+                        <input type="date" value={r.planEnd || ''} onChange={(e) => {
+                          const planEnd = e.target.value;
+                          setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, planEnd } : item)});
+                        }} className="w-full bg-white border border-slate-300 rounded p-1 text-[11px] mt-0.5" />
+                      </div>
+                      <div className="flex justify-between items-end">
+                        <div className="flex-1">
+                          <span className="text-emerald-700 font-medium">Факт финиша:</span>
+                          <input type="date" value={r.factEnd || ''} onChange={(e) => {
+                            const factEnd = e.target.value;
+                            setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, factEnd } : item)});
+                          }} className="w-full bg-white border border-emerald-300 rounded p-1 text-[11px] mt-0.5" />
+                        </div>
+                        <button type="button" onClick={() => handleRemoveRoleRow(idx)} className="text-rose-600 hover:text-rose-700 text-xs ml-2 mb-1">Удалить</button>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
