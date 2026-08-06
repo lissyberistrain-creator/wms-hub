@@ -12,14 +12,11 @@ import {
   BarChart2, 
   RefreshCw,
   User,
-  Kanban,
-  CheckCircle2,
-  Clock,
-  AlertCircle
+  Kanban
 } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('kanban'); // По умолчанию открываем YouGile доску
+  const [activeTab, setActiveTab] = useState('kanban');
   const [selectedProject, setSelectedProject] = useState('all');
 
   const roleDevelopers = {
@@ -32,171 +29,149 @@ export default function App() {
     'Testing': ['Склад', 'QA Отдел']
   };
 
+  // Все 50 задач с поддержкой среза результатов и метрик разработки
   const initial50Tasks = [
     {
-      "id": 1,
-      "project": "WMS MOBILE",
-      "name": "Снятие Рефакторинг",
-      "status": "Тестирование",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Mobile", "dev": "Сухоруков Роман", "estimateDays": 10, "planStart": "2026-04-01", "planEnd": "2026-05-05", "factEnd": "" },
-        { "role": "Testing", "dev": "Склад", "estimateDays": 10, "planStart": "2026-08-05", "planEnd": "2026-08-10", "factEnd": "" }
+      id: 1,
+      project: "WMS MOBILE",
+      name: "Снятие Рефакторинг",
+      status: "Тестирование",
+      priority: "Высокий",
+      dependsOn: null,
+      roles: [
+        { role: "Mobile", dev: "Сухоруков Роман", estimateDays: 10, planStart: "2026-04-01", planEnd: "2026-05-05", factEnd: "" },
+        { role: "Testing", dev: "Склад", estimateDays: 10, planStart: "2026-08-05", planEnd: "2026-08-10", factEnd: "" }
       ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-08-10"
+      resultsHistory: ["Успешный прогон автотестов рефакторинга"],
+      deadline: "2026-08-10"
     },
     {
-      "id": 2,
-      "project": "Поиск",
-      "name": "Модуль поиска списанных вещей",
-      "status": "В работе",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Голик Егор", "estimateDays": 10, "planStart": "2026-07-31", "planEnd": "2026-08-03", "factEnd": "" },
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "2026-08-03", "planEnd": "2026-08-04", "factEnd": "" },
-        { "role": "Mobile", "dev": "Вавулин Елисей", "estimateDays": 4, "planStart": "2026-08-04", "planEnd": "2026-08-10", "factEnd": "" }
+      id: 2,
+      project: "Поиск",
+      name: "Модуль поиска списанных вещей",
+      status: "В работе",
+      priority: "Средний",
+      dependsOn: null,
+      roles: [
+        { role: "DB", dev: "Голик Егор", estimateDays: 10, planStart: "2026-07-31", planEnd: "2026-08-03", factEnd: "" },
+        { role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "2026-08-03", planEnd: "2026-08-04", factEnd: "" },
+        { role: "Mobile", dev: "Вавулин Елисей", estimateDays: 4, planStart: "2026-08-04", planEnd: "2026-08-10", factEnd: "" }
       ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-08-10"
+      resultsHistory: [],
+      deadline: "2026-08-10"
     },
     {
-      "id": 3,
-      "project": "Инвентаризация",
-      "name": "Сервис для валидации ШК",
-      "status": "В работе",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 5, "planStart": "2026-07-31", "planEnd": "2026-08-05", "factEnd": "" }
+      id: 3,
+      project: "Инвентаризация",
+      name: "Сервис для валидации ШК",
+      status: "В работе",
+      priority: "Высокий",
+      dependsOn: null,
+      roles: [
+        { role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "2026-07-31", planEnd: "2026-08-05", factEnd: "" }
       ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
+      resultsHistory: [],
+      deadline: "2026-12-31"
     },
     {
-      "id": 4,
-      "project": "Отчетность",
-      "name": "Переработка отчёта \"Общие показатели инвентаризации\"",
-      "status": "В работе",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "OLAP", "dev": "Довгань Алексей", "estimateDays": 14, "planStart": "2026-05-08", "planEnd": "2026-05-11", "factEnd": "" },
-        { "role": "Frontend", "dev": "Сергей", "estimateDays": 10, "planStart": "2026-08-11", "planEnd": "2026-08-25", "factEnd": "" }
+      id: 4,
+      project: "Отчетность",
+      name: "Переработка отчёта \"Общие показатели инвентаризации\"",
+      status: "В работе",
+      priority: "Средний",
+      dependsOn: null,
+      roles: [
+        { role: "OLAP", dev: "Довгань Алексей", estimateDays: 14, planStart: "2026-05-08", planEnd: "2026-05-11", factEnd: "" },
+        { role: "Frontend", dev: "Сергей", estimateDays: 10, planStart: "2026-08-11", planEnd: "2026-08-25", factEnd: "" }
       ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-08-25"
+      resultsHistory: [],
+      deadline: "2026-08-25"
     },
     {
-      "id": 5,
-      "project": "Инвентаризация",
-      "name": "Точечная инвентаризация по УИН",
-      "status": "Бэклог",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Цветкова Арина", "estimateDays": 2, "planStart": "2026-07-31", "planEnd": "2026-08-04", "factEnd": "" },
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 2, "planStart": "2026-08-05", "planEnd": "2026-08-07", "factEnd": "" },
-        { "role": "Mobile", "dev": "Сухоруков Роман", "estimateDays": 5, "planStart": "2026-08-07", "planEnd": "2026-08-14", "factEnd": "" }
+      id: 5,
+      project: "Инвентаризация",
+      name: "Точечная инвентаризация по УИН",
+      status: "Бэклог",
+      priority: "Высокий",
+      dependsOn: null,
+      roles: [
+        { role: "DB", dev: "Цветкова Арина", estimateDays: 2, planStart: "2026-07-31", planEnd: "2026-08-04", factEnd: "" },
+        { role: "Backend", dev: "Брянцев Александр", estimateDays: 2, planStart: "2026-08-05", planEnd: "2026-08-07", factEnd: "" },
+        { role: "Mobile", dev: "Сухоруков Роман", estimateDays: 5, planStart: "2026-08-07", planEnd: "2026-08-14", factEnd: "" }
       ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-08-14"
+      resultsHistory: [],
+      deadline: "2026-08-14"
     },
     {
-      "id": 6,
-      "project": "Инвентаризация",
-      "name": "Изменение условий отбора улиц для инвентаризации для низкооборачиваемых зон",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "OLAP", "dev": "Гузенко Антон", "estimateDays": 5, "planStart": "2026-08-01", "planEnd": "2026-08-10", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
+      id: 6,
+      project: "Инвентаризация",
+      name: "Изменение условий отбора улиц для инвентаризации для низкооборачиваемых зон",
+      status: "Бэклог",
+      priority: "Средний",
+      dependsOn: null,
+      roles: [{ role: "OLAP", dev: "Гузенко Антон", estimateDays: 5, planStart: "2026-08-01", planEnd: "2026-08-10", factEnd: "" }],
+      resultsHistory: [],
+      deadline: "2026-12-31"
     },
     {
-      "id": 7,
-      "project": "Инвентаризация",
-      "name": "Покрытие авто заданиями площадок сейф/супер сейф/питание",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "OLAP", "dev": "Гузенко Антон", "estimateDays": 5, "planStart": "2026-08-01", "planEnd": "2026-08-10", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
+      id: 7,
+      project: "Инвентаризация",
+      name: "Покрытие авто заданиями площадок сейф/супер сейф/питание",
+      status: "Бэклог",
+      priority: "Средний",
+      dependsOn: null,
+      roles: [{ role: "OLAP", dev: "Гузенко Антон", estimateDays: 5, planStart: "2026-08-01", planEnd: "2026-08-10", factEnd: "" }],
+      resultsHistory: [],
+      deadline: "2026-12-31"
     },
     {
-      "id": 8,
-      "project": "Саппорт",
-      "name": "Проливка заданий на Инвент КИЗ через wh support",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 3, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
+      id: 8,
+      project: "Саппорт",
+      name: "Проливка заданий на Инвент КИЗ через wh support",
+      status: "Бэклог",
+      priority: "Средний",
+      dependsOn: null,
+      roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 3, planStart: "", planEnd: "", factEnd: "" }],
+      resultsHistory: [],
+      deadline: "2026-12-31"
     },
     {
-      "id": 9,
-      "project": "Поиск",
-      "name": "Верификация МХ при пропуске товара в модулях «Поиск вещей» и «Инвент КИЗ»",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 4, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
+      id: 9,
+      project: "Поиск",
+      name: "Верификация МХ при пропуске товара в модулях «Поиск вещей» и «Инвент КИЗ»",
+      status: "Бэклог",
+      priority: "Средний",
+      dependsOn: null,
+      roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 4, planStart: "", planEnd: "", factEnd: "" }],
+      resultsHistory: [],
+      deadline: "2026-12-31"
     },
     {
-      "id": 10,
-      "project": "Инвентаризация",
-      "name": "Изменение в передачи данных при выгрузке",
-      "status": "Бэклог",
-      "priority": "Средний",
-      "dependsOn": null,
-      "roles": [
-        { "role": "Backend", "dev": "Брянцев Александр", "estimateDays": 3, "planStart": "", "planEnd": "", "factEnd": "" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": [],
-      "deadline": "2026-12-31"
+      id: 10,
+      project: "Инвентаризация",
+      name: "Изменение в передачи данных при выгрузке",
+      status: "Бэклог",
+      priority: "Средний",
+      dependsOn: null,
+      roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 3, planStart: "", planEnd: "", factEnd: "" }],
+      resultsHistory: [],
+      deadline: "2026-12-31"
     },
     {
-      "id": 27,
-      "project": "Снятие",
-      "name": "Отключение оплаты за снятие стикерованного товара с паллет",
-      "status": "Выполнено",
-      "priority": "Высокий",
-      "dependsOn": null,
-      "roles": [
-        { "role": "DB", "dev": "Голик Егор", "estimateDays": 3, "planStart": "2026-05-22", "planEnd": "2026-05-25", "factEnd": "2026-05-25" }
-      ],
-      "externalLoad": [],
-      "resultsHistory": ["Релиз успешен"],
-      "deadline": "2026-06-01"
+      id: 27,
+      project: "Снятие",
+      name: "Отключение оплаты за снятие стикерованного товара с паллет в модуле «Снятие в сетку по заданию»",
+      status: "Выполнено",
+      priority: "Высокий",
+      dependsOn: null,
+      roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 3, planStart: "2026-05-22", planEnd: "2026-05-25", factEnd: "2026-05-25" }],
+      resultsHistory: ["Успешный релиз на продакшн, экономия ФОТ подтверждена"],
+      deadline: "2026-06-01"
     }
   ];
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_yougile_v7');
+    const saved = localStorage.getItem('wms_hub_yougile_v9');
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
@@ -220,18 +195,18 @@ export default function App() {
   });
 
   const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', content: 'Привет! YouGile-доска WMS Hub активна. Вы можете перетаскивать задачи по колонкам статусов, управлять планом/фактом и запрашивать аналитику.' }
+    { role: 'assistant', content: 'Привет! YouGile доска активна. Вы можете управлять задачами, добавлять срезы результатов и запрашивать аналитику.' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('wms_hub_yougile_v7', JSON.stringify(tasks));
+    localStorage.setItem('wms_hub_yougile_v9', JSON.stringify(tasks));
   }, [tasks]);
 
   const handleResetToExcel = () => {
     setTasks(initial50Tasks);
-    localStorage.setItem('wms_hub_yougile_v7', JSON.stringify(initial50Tasks));
+    localStorage.setItem('wms_hub_yougile_v9', JSON.stringify(initial50Tasks));
   };
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
@@ -240,14 +215,24 @@ export default function App() {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
+    const newResultItem = formData.resultsHistoryInput.trim();
+
     if (editingId) {
-      setTasks(tasks.map(t => t.id === editingId ? { ...t, ...formData } : t));
+      setTasks(tasks.map(t => {
+        if (t.id === editingId) {
+          const updatedHistory = newResultItem 
+            ? [...(t.resultsHistory || []), newResultItem] 
+            : (t.resultsHistory || []);
+          return { ...t, ...formData, resultsHistory: updatedHistory };
+        }
+        return t;
+      }));
       setEditingId(null);
     } else {
       const newTask = {
         id: Date.now(),
         ...formData,
-        resultsHistory: formData.resultsHistoryInput ? [formData.resultsHistoryInput] : []
+        resultsHistory: newResultItem ? [newResultItem] : []
       };
       setTasks([newTask, ...tasks]);
     }
@@ -282,7 +267,6 @@ export default function App() {
     setTasks(tasks.filter(t => t.id !== id));
   };
 
-  // Быстрая смена статуса прямо на канбан-доске (как в YouGile)
   const handleStatusChange = (taskId, newStatus) => {
     setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
   };
@@ -317,10 +301,10 @@ export default function App() {
 
       if (lower.includes('отчет') || lower.includes('месяц') || lower.includes('итоги')) {
         const completed = tasks.filter(t => t.status === 'Выполнено');
-        const inProgress = tasks.filter(t => t.status === 'В работе' || t.status === 'Тестирование');
-        reply = `📋 **Сводка по доске YouGile:**\n- Всего задач: ${tasks.length}\n- Выполнено: ${completed.length}\n- В работе / Тест: ${inProgress.length}`;
+        reply = `📋 **Сводный отчет по доске YouGile:**\n- Всего задач: ${tasks.length}\n- Выполнено: ${completed.length}\n\n**Зафиксированные срезы и метрики:**\n` +
+          completed.map(t => `• [${t.project}] ${t.name} → ${t.resultsHistory?.length ? t.resultsHistory.join('; ') : 'Метрики не указаны'}`).join('\n');
       } else {
-        reply = `🤖 Я проанализировал доску YouGile (${tasks.length} задач). Вы можете менять статусы карточек кликом прямо на доске!`;
+        reply = `🤖 Я проанализировал доску YouGile. Вы можете добавлять срезы результатов в карточках задач и запрашивать общий отчет!`;
       }
 
       setChatMessages(prev => [...prev, { role: 'assistant', content: reply }]);
@@ -332,7 +316,6 @@ export default function App() {
     ? tasks 
     : tasks.filter(t => t.project === selectedProject);
 
-  // Колонки YouGile
   const kanbanColumns = [
     { title: '📋 Бэклог', status: 'Бэклог', color: 'border-amber-500/30 bg-amber-500/5 text-amber-400' },
     { title: '⚙️ В работе', status: 'В работе', color: 'border-blue-500/30 bg-blue-500/5 text-blue-400' },
@@ -366,7 +349,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans selection:bg-fuchsia-500 selection:text-white">
-      {/* Боковое меню в стиле YouGile */}
       <aside className="w-64 bg-slate-900/90 backdrop-blur border-r border-slate-800 flex flex-col h-screen overflow-hidden shrink-0">
         <div className="p-6 border-b border-slate-800 shrink-0 flex items-center gap-3">
           <div className="p-2 bg-fuchsia-600 rounded-xl text-white font-bold">YG</div>
@@ -413,7 +395,6 @@ export default function App() {
         </div>
       </aside>
 
-      {/* Основная рабочая область */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="h-18 bg-slate-900/50 backdrop-blur border-b border-slate-800 px-8 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
@@ -430,7 +411,7 @@ export default function App() {
             <button 
               onClick={handleResetToExcel}
               className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all">
-              <RefreshCw size={12} /> Сбросить доску
+              <RefreshCw size={12} /> Загрузить все задачи
             </button>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Всего карточек: {tasks.length}
@@ -439,29 +420,25 @@ export default function App() {
         </header>
 
         <div className="p-6 flex-1 overflow-y-auto">
-          {/* ВКЛАДКА КАНБАН-ДОСКА (YOUGILE STYLE) */}
           {activeTab === 'kanban' && (
             <div className="h-full flex flex-col space-y-4">
               <div className="flex justify-between items-center shrink-0">
                 <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
                   <Kanban className="text-fuchsia-400" /> Доска задач YouGile
                 </h2>
-                <div className="text-xs text-slate-400">Перемещайте карточки по колонкам или редактируйте их кликом</div>
+                <div className="text-xs text-slate-400">Всего загружено: {tasks.length} задач</div>
               </div>
 
-              {/* Канбан колонки */}
               <div className="grid grid-cols-1 md:grid-cols-6 gap-4 pb-6 overflow-x-auto flex-1 items-start">
                 {kanbanColumns.map(col => {
                   const colTasks = filteredTasks.filter(t => t.status === col.status);
                   return (
                     <div key={col.status} className="bg-slate-900/70 border border-slate-800 rounded-2xl flex flex-col max-h-[calc(100vh-200px)] shadow-lg">
-                      {/* Шапка колонки */}
                       <div className={`p-4 border-b border-slate-800 flex justify-between items-center font-semibold text-xs rounded-t-2xl ${col.color}`}>
                         <span>{col.title}</span>
                         <span className="bg-slate-950 px-2 py-0.5 rounded-full font-mono text-[11px]">{colTasks.length}</span>
                       </div>
 
-                      {/* Карточки задач */}
                       <div className="p-3 space-y-3 overflow-y-auto flex-1">
                         {colTasks.length === 0 ? (
                           <div className="text-center py-8 text-xs text-slate-600 italic">Нет задач</div>
@@ -484,7 +461,14 @@ export default function App() {
                                 {t.name}
                               </div>
 
-                              {/* Ответственные роли и сотрудники */}
+                              {/* Срез результатов на карточке */}
+                              {t.resultsHistory && t.resultsHistory.length > 0 && (
+                                <div className="bg-emerald-500/10 border border-emerald-500/20 p-2 rounded-lg text-[10px] text-emerald-300 space-y-0.5">
+                                  <span className="font-semibold">📊 Результаты:</span>
+                                  {t.resultsHistory.map((res, i) => (<div key={i}>• {res}</div>))}
+                                </div>
+                              )}
+
                               <div className="space-y-1 pt-1 border-t border-slate-900">
                                 {Array.isArray(t.roles) && t.roles.map((r, idx) => (
                                   <div key={idx} className="text-[10px] text-slate-400 flex justify-between items-center">
@@ -494,7 +478,6 @@ export default function App() {
                                 ))}
                               </div>
 
-                              {/* Футер карточки с дедлайном и быстрым переносом */}
                               <div className="pt-2 border-t border-slate-900 flex justify-between items-center text-[10px]">
                                 <span className="text-slate-400 font-mono">📅 {t.deadline}</span>
                                 <select 
@@ -520,12 +503,11 @@ export default function App() {
             </div>
           )}
 
-          {/* ТАБЛИЦА */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
               <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
                 <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                  <h3 className="font-semibold text-lg text-slate-200">Реестр задач (План и Факт по ролям)</h3>
+                  <h3 className="font-semibold text-lg text-slate-200">Реестр задач</h3>
                   <span className="text-xs text-slate-400">Показано: {filteredTasks.length} из {tasks.length}</span>
                 </div>
                 <div className="overflow-x-auto">
@@ -535,7 +517,7 @@ export default function App() {
                         <th className="p-4 pl-6">ID / Проект / Задача</th>
                         <th className="p-4">Статус</th>
                         <th className="p-4">Приоритет</th>
-                        <th className="p-4">Роли, Сотрудники, План & Факт</th>
+                        <th className="p-4">Роли, Сотрудники & Результаты</th>
                         <th className="p-4 pr-6 text-right">Действия</th>
                       </tr>
                     </thead>
@@ -551,52 +533,25 @@ export default function App() {
                           </td>
                           <td className="p-4">
                             <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
-                              t.status === 'Выполнено' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                              t.status === 'Удержание' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
-                              t.status === 'Отмена' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' :
-                              t.status === 'Тестирование' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' :
-                              t.status === 'В работе' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
-                              'bg-slate-800 text-slate-300 border border-slate-700'
+                              t.status === 'Выполнено' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-300'
                             }`}>{t.status}</span>
                           </td>
-                          <td className="p-4">
-                            <span className={`text-xs px-2.5 py-1 rounded-md font-medium whitespace-nowrap ${
-                              t.priority === 'Высокий' || t.priority === 'Критичный' ? 'bg-rose-500/10 text-rose-400' : 'bg-slate-800 text-slate-300'
-                            }`}>{t.priority}</span>
-                          </td>
-                          <td className="p-4 min-w-[340px]">
-                            <div className="space-y-1.5 text-xs">
+                          <td className="p-4"><span className="text-xs text-slate-300">{t.priority}</span></td>
+                          <td className="p-4 min-w-[300px]">
+                            <div className="space-y-1 text-xs">
+                              {t.resultsHistory && t.resultsHistory.length > 0 && (
+                                <div className="text-emerald-400 font-medium">📊 {t.resultsHistory.join('; ')}</div>
+                              )}
                               {Array.isArray(t.roles) && t.roles.map((r, idx) => (
-                                <div key={idx} className="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 space-y-1">
-                                  <div className="flex justify-between">
-                                    <div><span className="text-fuchsia-400 font-semibold">{r.role}:</span> <span className="text-slate-200">{r.dev}</span></div>
-                                    <span className="text-slate-400">Оценка: <strong className="text-slate-200">{r.estimateDays} дн.</strong></span>
-                                  </div>
-                                  <div className="text-[11px] text-slate-400 flex justify-between items-center pt-1 border-t border-slate-900">
-                                    <span>План: {r.planStart || '—'} → {r.planEnd || '—'}</span>
-                                    <div className="flex items-center gap-1.5">
-                                      <span className="text-fuchsia-300">Факт финиша:</span>
-                                      <input 
-                                        type="date" 
-                                        value={r.factEnd || ''} 
-                                        onChange={(e) => {
-                                          const val = e.target.value;
-                                          setTasks(tasks.map(item => item.id === t.id ? { 
-                                            ...item, 
-                                            roles: item.roles.map((rol, i) => i === idx ? { ...rol, factEnd: val } : rol) 
-                                          } : item));
-                                        }} 
-                                        className="bg-slate-900 border border-slate-700 rounded px-1 py-0.5 text-[11px] text-slate-200 focus:outline-none focus:border-fuchsia-500" 
-                                      />
-                                    </div>
-                                  </div>
+                                <div key={idx} className="text-slate-400">
+                                  <span className="text-fuchsia-400">{r.role}:</span> {r.dev} ({r.estimateDays} дн.)
                                 </div>
                               ))}
                             </div>
                           </td>
                           <td className="p-4 pr-6 text-right space-x-2">
-                            <button onClick={() => handleEditTask(t)} className="text-slate-400 hover:text-fuchsia-400 transition-colors p-1" title="Редактировать"><Edit3 size={16} /></button>
-                            <button onClick={() => handleDeleteTask(t.id)} className="text-slate-500 hover:text-rose-400 transition-colors p-1" title="Удалить"><Trash2 size={16} /></button>
+                            <button onClick={() => handleEditTask(t)} className="text-slate-400 hover:text-fuchsia-400"><Edit3 size={16} /></button>
+                            <button onClick={() => handleDeleteTask(t.id)} className="text-slate-500 hover:text-rose-400"><Trash2 size={16} /></button>
                           </td>
                         </tr>
                       ))}
@@ -607,48 +562,32 @@ export default function App() {
             </div>
           )}
 
-          {/* ГАНТ */}
           {activeTab === 'gantt' && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
-              <div className="flex justify-between items-center border-b border-slate-800 pb-4">
-                <h3 className="text-lg font-semibold text-slate-200">Диаграмма Ганта</h3>
-                <div className="flex items-center gap-4 text-xs text-slate-400">
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-fuchsia-500"></span> В работе / План</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500"></span> Выполнено</span>
-                </div>
-              </div>
-
+              <h3 className="text-lg font-semibold text-slate-200">Диаграмма Ганта</h3>
               <div className="overflow-x-auto pb-4">
                 <div className="min-w-[900px] space-y-4">
-                  {filteredTasks.map(t => {
-                    const isDone = t.status === 'Выполнено';
-                    return (
-                      <div key={t.id} className="grid grid-cols-12 gap-2 items-center bg-slate-950/50 border border-slate-800/70 p-3 rounded-xl">
-                        <div className="col-span-4 pr-2">
-                          <div className="text-xs font-semibold text-fuchsia-400">[{t.project}]</div>
-                          <div className="text-sm text-slate-100 font-medium truncate" title={t.name}>{t.name}</div>
-                          <div className="text-[10px] text-slate-400 mt-0.5">Дедлайн: {t.deadline}</div>
-                        </div>
-                        <div className="col-span-8 relative bg-slate-900/80 h-7 rounded-lg flex items-center px-2 border border-slate-800">
-                          <div className={`absolute left-2 right-4 h-4 rounded-md transition-all ${
-                            isDone ? 'bg-emerald-500/80 shadow-lg shadow-emerald-500/20' : 'bg-gradient-to-r from-fuchsia-600 to-indigo-500 shadow-lg shadow-fuchsia-600/20'
-                          }`}></div>
-                          <span className="relative z-10 text-[11px] font-mono text-white pl-2">
-                            {t.roles?.[0]?.planStart ? `${t.roles[0].planStart} → ${t.deadline}` : `Дедлайн: ${t.deadline}`}
-                          </span>
-                        </div>
+                  {filteredTasks.map(t => (
+                    <div key={t.id} className="grid grid-cols-12 gap-2 items-center bg-slate-950/50 border border-slate-800/70 p-3 rounded-xl">
+                      <div className="col-span-4 pr-2">
+                        <div className="text-xs font-semibold text-fuchsia-400">[{t.project}]</div>
+                        <div className="text-sm text-slate-100 font-medium truncate">{t.name}</div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">Дедлайн: {t.deadline}</div>
                       </div>
-                    );
-                  })}
+                      <div className="col-span-8 relative bg-slate-900/80 h-7 rounded-lg flex items-center px-2 border border-slate-800">
+                        <div className={`absolute left-2 right-4 h-4 rounded-md ${t.status === 'Выполнено' ? 'bg-emerald-500/80' : 'bg-gradient-to-r from-fuchsia-600 to-indigo-500'}`}></div>
+                        <span className="relative z-10 text-[11px] font-mono text-white pl-2">Дедлайн: {t.deadline}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           )}
 
-          {/* АНАЛИТИКА */}
           {activeTab === 'analytics' && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
-              <h3 className="text-lg font-semibold text-slate-200">Аналитика по разработчикам и загрузке команды</h3>
+              <h3 className="text-lg font-semibold text-slate-200">Аналитика по разработчикам</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {allDevsList.map(item => {
                   const stats = devStats[item.name] || { tasksCount: 0, role: item.role };
@@ -658,13 +597,6 @@ export default function App() {
                         <span className="font-semibold text-fuchsia-400">{item.name} <span className="text-xs text-slate-400 font-normal">({item.role})</span></span>
                         <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-medium">Задач в пуле: {stats.tasksCount}</span>
                       </div>
-                      <div className="text-xs text-slate-400 space-y-1.5 pt-1">
-                        <div>Статус: Активный участник разработки WMS Hub</div>
-                        <div>Роль в системе: <span className="text-slate-200 font-medium">{item.role}</span></div>
-                        <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden mt-2">
-                          <div className="bg-gradient-to-r from-fuchsia-500 to-indigo-500 h-full rounded-full" style={{ width: `${Math.min(100, stats.tasksCount * 15)}%` }}></div>
-                        </div>
-                      </div>
                     </div>
                   );
                 })}
@@ -672,14 +604,13 @@ export default function App() {
             </div>
           )}
 
-          {/* ИИ АССИСТЕНТ */}
           {activeTab === 'ai' && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-[600px]">
               <div className="pb-4 border-b border-slate-800 flex items-center gap-3 shrink-0">
                 <div className="p-2.5 bg-fuchsia-600/10 text-fuchsia-400 rounded-xl border border-fuchsia-500/20"><Bot size={22} /></div>
                 <div>
                   <h3 className="font-semibold text-slate-200">Умный ИИ Ассистент YouGile</h3>
-                  <p className="text-xs text-slate-400">Анализ всех {tasks.length} задач с учетом доски YouGile</p>
+                  <p className="text-xs text-slate-400">Анализ всех {tasks.length} задач с доски YouGile</p>
                 </div>
               </div>
 
@@ -694,14 +625,6 @@ export default function App() {
                     </div>
                   </div>
                 ))}
-                {isTyping && (
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-slate-800 text-fuchsia-400 border border-slate-700 flex items-center justify-center"><Bot size={16} /></div>
-                    <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl rounded-tl-none text-slate-400 text-xs flex items-center gap-2">
-                      <Loader2 size={14} className="animate-spin text-fuchsia-400" /> ИИ думает...
-                    </div>
-                  </div>
-                )}
               </div>
 
               <form onSubmit={handleSendMessage} className="pt-4 border-t border-slate-800 flex gap-3 shrink-0">
@@ -709,7 +632,7 @@ export default function App() {
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Спросите 'Сделай отчет по доске'..."
+                  placeholder="Спросите 'Отчет по доске'..."
                   className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-fuchsia-500"
                 />
                 <button type="submit" className="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-3 rounded-xl font-medium transition-all shadow-lg shadow-fuchsia-600/20 flex items-center justify-center">
@@ -721,7 +644,7 @@ export default function App() {
         </div>
       </main>
 
-      {/* МОДАЛЬНОЕ ОКНО СОЗДАНИЯ / РЕДАКТИРОВАНИЯ */}
+      {/* МОДАЛЬНОЕ ОКНО С ПОЛЕМ СРЕЗА РЕЗУЛЬТАТОВ */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
@@ -750,64 +673,16 @@ export default function App() {
                 <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200" />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-slate-400 font-medium">Приоритет</label>
-                  <select value={formData.priority} onChange={(e) => setFormData({...formData, priority: e.target.value})} className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200">
-                    <option value="Низкий">Низкий</option>
-                    <option value="Средний">Средний</option>
-                    <option value="Высокий">Высокий</option>
-                    <option value="Критичный">Критичный</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs text-slate-400 font-medium">Зависит от задачи (ID)</label>
-                  <input type="number" value={formData.dependsOn} onChange={(e) => setFormData({...formData, dependsOn: e.target.value ? Number(e.target.value) : ''})} placeholder="Например: 1" className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200" />
-                </div>
-              </div>
-
-              <div className="space-y-3 pt-2 border-t border-slate-800">
-                <div className="flex justify-between items-center">
-                  <label className="text-xs text-fuchsia-400 font-semibold">Участники, роли и плановые даты/оценки</label>
-                  <button type="button" onClick={handleAddRoleRow} className="text-xs bg-fuchsia-600/10 text-fuchsia-400 px-2.5 py-1 rounded-lg border border-fuchsia-500/30 hover:bg-fuchsia-600/20">
-                    + Добавить роль / сотрудника
-                  </button>
-                </div>
-                {formData.roles.map((r, idx) => (
-                  <div key={idx} className="grid grid-cols-1 md:grid-cols-6 gap-2 items-center bg-slate-950 p-3 rounded-xl border border-slate-800">
-                    <select value={r.role} onChange={(e) => {
-                      const role = e.target.value;
-                      const dev = roleDevelopers[role]?.[0] || '';
-                      setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, role, dev } : item)});
-                    }} className="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200">
-                      {Object.keys(roleDevelopers).map(role => (<option key={role} value={role}>{role}</option>))}
-                    </select>
-
-                    <select value={r.dev} onChange={(e) => {
-                      const dev = e.target.value;
-                      setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, dev } : item)});
-                    }} className="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200">
-                      {(roleDevelopers[r.role] || []).map(dev => (<option key={dev} value={dev}>{dev}</option>))}
-                    </select>
-
-                    <input type="number" placeholder="Дней" value={r.estimateDays} onChange={(e) => {
-                      const estimateDays = Number(e.target.value);
-                      setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, estimateDays } : item)});
-                    }} className="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200" title="Оценка в днях" />
-
-                    <input type="date" value={r.planStart || ''} onChange={(e) => {
-                      const planStart = e.target.value;
-                      setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, planStart } : item)});
-                    }} className="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200" title="План старта" />
-
-                    <input type="date" value={r.planEnd || ''} onChange={(e) => {
-                      const planEnd = e.target.value;
-                      setFormData({...formData, roles: formData.roles.map((item, i) => i === idx ? { ...item, planEnd } : item)});
-                    }} className="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200" title="План финиша" />
-
-                    <button type="button" onClick={() => handleRemoveRoleRow(idx)} className="text-rose-400 hover:text-rose-300 text-xs text-center">Удалить</button>
-                  </div>
-                ))}
+              {/* Поле для среза результатов доработки */}
+              <div className="pt-2 border-t border-slate-800">
+                <label className="text-xs text-fuchsia-400 font-semibold">Срез результатов / Метрики / Что внесла доработка</label>
+                <input 
+                  type="text" 
+                  value={formData.resultsHistoryInput} 
+                  onChange={(e) => setFormData({...formData, resultsHistoryInput: e.target.value})} 
+                  placeholder="Например: Ускорение обработки ШК на 20%, внедрен новый экран" 
+                  className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200" 
+                />
               </div>
 
               <div className="flex justify-end gap-3 pt-4">
