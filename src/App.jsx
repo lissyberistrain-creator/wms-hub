@@ -93,7 +93,7 @@ export default function App() {
   ];
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_light_v23');
+    const saved = localStorage.getItem('wms_hub_light_v24');
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
@@ -125,7 +125,7 @@ export default function App() {
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('wms_hub_light_v23', JSON.stringify(tasks));
+    localStorage.setItem('wms_hub_light_v24', JSON.stringify(tasks));
   }, [tasks]);
 
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function App() {
 
   const handleResetToExcel = () => {
     setTasks(initial50Tasks);
-    localStorage.setItem('wms_hub_light_v23', JSON.stringify(initial50Tasks));
+    localStorage.setItem('wms_hub_light_v24', JSON.stringify(initial50Tasks));
   };
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
@@ -381,6 +381,27 @@ export default function App() {
     }
   });
 
+  // Вспомогательная функция для расчета динамической ширины и отступа полосы Ганта (таймлайн с 2026-01-01 по 2026-12-31)
+  const getGanttBarStyles = (startStr, endStr) => {
+    const timelineStart = new Date('2026-01-01').getTime();
+    const timelineEnd = new Date('2026-12-31').getTime();
+    const totalDuration = timelineEnd - timelineStart;
+
+    const sDate = new Date(startStr || '2026-01-01').getTime();
+    const eDate = new Date(endStr || '2026-12-31').getTime();
+
+    const clampedStart = Math.max(timelineStart, Math.min(timelineEnd, sDate));
+    const clampedEnd = Math.max(timelineStart, Math.min(timelineEnd, eDate));
+
+    const leftPercent = Math.max(0, Math.min(100, ((clampedStart - timelineStart) / totalDuration) * 100));
+    const widthPercent = Math.max(2, Math.min(100 - leftPercent, ((clampedEnd - clampedStart) / totalDuration) * 100));
+
+    return {
+      left: `${leftPercent}%`,
+      width: `${widthPercent}%`
+    };
+  };
+
   return (
     <div className="min-h-screen text-slate-900 flex font-sans relative overflow-x-hidden" style={{ background: '#f5f6f8' }}>
       <div className="absolute inset-0 pointer-events-none opacity-40 z-0" style={{
@@ -612,7 +633,7 @@ export default function App() {
             </div>
           )}
 
-          {/* НАСТОЯЩИЙ ГАНТ С ИДЕАЛЬНО ФИКСИРОВАННЫМИ ЛЕВЫМИ КОЛОНКАМИ И АДАПТИВНОЙ ШКАЛОЙ ПО МЕСЯЦАМ */}
+          {/* НАСТОЯЩИЙ ГАНТ С ФИКСИРОВАННЫМИ ДАТАМИ СВЕРХУ И ДИНАМИЧЕСКИМИ ПОЛОСАМИ */}
           {activeTab === 'gantt' && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
               <div className="flex justify-between items-center border-b border-slate-200 pb-4">
@@ -623,53 +644,47 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Обертка с горизонтальным скроллом */}
-              <div className="overflow-x-auto pb-4 border border-slate-200 rounded-xl relative">
+              {/* Обертка с вертикальным и горизонтальным скроллом */}
+              <div className="overflow-auto max-h-[650px] border border-slate-200 rounded-xl relative shadow-sm">
                 <div className="min-w-[1600px]">
-                  {/* Шапка таблицы по месяцам */}
-                  <div className="grid grid-cols-12 bg-slate-100 border-b border-slate-200 text-[11px] font-bold text-slate-700 text-center py-2.5 items-center">
-                    {/* Фиксированные слева колонки */}
-                    <div className="w-80 text-left pl-4 sticky left-0 bg-slate-100 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Проект & Задача</div>
-                    <div className="w-32 sticky left-80 bg-slate-100 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Статус</div>
+                  {/* Зафиксированная шапка с месяцами сверху при прокрутке */}
+                  <div className="grid grid-cols-12 bg-slate-100 border-b border-slate-200 text-[11px] font-bold text-slate-700 text-center py-3 items-center sticky top-0 z-40 shadow-sm">
+                    <div className="w-80 text-left pl-4 sticky left-0 bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Проект & Задача</div>
+                    <div className="w-32 sticky left-80 bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Статус</div>
                     
-                    {/* Адаптивная шкала месяцев справа */}
-                    <div className="col-span-8 grid grid-cols-6 text-[10px] text-slate-600 font-mono">
-                      <span>Март 2026</span>
-                      <span>Апр 2026</span>
-                      <span>Май 2026</span>
-                      <span>Июн 2026</span>
-                      <span>Июл 2026</span>
-                      <span>Авг 2026+</span>
+                    <div className="col-span-8 grid grid-cols-12 text-[10px] text-slate-600 font-mono">
+                      <span>Янв</span><span>Фев</span><span>Мар</span><span>Апр</span><span>Май</span><span>Июн</span>
+                      <span>Июл</span><span>Авг</span><span>Сен</span><span>Окт</span><span>Ноя</span><span>Дек</span>
                     </div>
                   </div>
 
                   {/* Строки задач */}
-                  <div className="divide-y divide-slate-100">
+                  <div className="divide-y divide-slate-100 bg-white">
                     {filteredTasks.map(t => {
                       const isDone = t.status === 'Выполнено';
                       const isInProgress = t.status === 'В работе' || t.status === 'Тестирование';
+                      const barStyle = getGanttBarStyles(t.startDate || '2026-01-01', t.deadline || '2026-12-31');
+
                       return (
-                        <div key={t.id} className="grid grid-cols-12 items-center text-xs py-2 px-2 hover:bg-slate-50">
-                          {/* Фиксированный проект и задача слева */}
+                        <div key={t.id} className="grid grid-cols-12 items-center text-xs py-2.5 px-2 hover:bg-slate-50 transition-colors">
                           <div className="w-80 pr-2 pl-2 sticky left-0 bg-white z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                             <span className="text-[10px] font-bold text-[#cb11ab] block">[{t.project}]</span>
                             <span className="font-semibold text-slate-800 truncate block" title={t.name}>{t.name}</span>
                           </div>
                           
-                          {/* Фиксированный статус слева */}
                           <div className="w-32 sticky left-80 bg-white z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                             <span className={`px-2 py-0.5 rounded text-[10px] font-medium inline-block ${
                               isDone ? 'bg-emerald-50 text-emerald-700' : isInProgress ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600'
                             }`}>{t.status}</span>
                           </div>
 
-                          {/* Динамическая расширяющаяся полоса Ганта по месяцам */}
-                          <div className="col-span-8 relative bg-slate-50 h-7 rounded flex items-center px-1 border border-slate-200 ml-4">
-                            <div className={`absolute h-4 rounded shadow-sm ${
+                          {/* Динамическая шкала Ганта с индивидуальной длиной полосы */}
+                          <div className="col-span-8 relative bg-slate-50 h-7 rounded-lg flex items-center px-1 border border-slate-200 ml-4 overflow-hidden">
+                            <div className={`absolute h-4 rounded-md shadow-sm transition-all ${
                               isDone ? 'bg-emerald-500' : isInProgress ? 'bg-[#cb11ab]' : 'bg-amber-400'
-                            }`} style={{ left: '5%', right: '25%' }}></div>
-                            <span className="relative z-10 text-[10px] font-mono text-white pl-2 font-bold">
-                              Старт: {t.startDate || '2026-04-01'} → Дедлайн: {t.deadline}
+                            }`} style={barStyle}></div>
+                            <span className="relative z-10 text-[10px] font-mono text-slate-700 pl-2 font-bold bg-white/70 px-1 rounded">
+                              {t.startDate ? `${t.startDate} → ` : ''}{t.deadline}
                             </span>
                           </div>
                         </div>
