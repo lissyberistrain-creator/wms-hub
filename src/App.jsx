@@ -62,14 +62,14 @@ export default function App() {
     { id: 20, project: "Саппорт", name: "Признак \"Супер сейф\"", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01" },
     { id: 21, project: "Саппорт", name: "Создание заданий на инвент КБТ по заявкам", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01" },
     { id: 22, project: "Саппорт", name: "Ограничение для формирования авто задач в модуле снятие по предметам", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01" },
-    { id: 23, project: "Инвентаризация", name: "Сквозной идентификатор заданий на инвент", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 10, planStart: "2026-08-01", planEnd: "2026-09-15", factEnd: "" }], resultsHistory: [], deadline: "2026-09-15", startDate: "2026-08-01" },
+    { id: 23, project: "Инвентаризация", name: "Сквозной идентификатор заданий на инвент", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 10, planStart: "2025-11-01", planEnd: "2025-12-15", factEnd: "" }], resultsHistory: [], deadline: "2026-09-15", startDate: "2025-11-01" },
     { id: 24, project: "Инвентаризация", name: "Объединение процессов Инвентаризации", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01" },
     { id: 25, project: "Снятие", name: "Указывать тип подбора после скана баркода", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01" },
     { id: 26, project: "Инвентаризация", name: "Отдельный параметр сдачи заданий на инвент", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01" },
     { id: 27, project: "Снятие", name: "Отключение оплаты за снятие стикерованного товара с паллет в модуле «Снятие в сетку по заданию»", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 3, planStart: "2026-05-22", planEnd: "2026-06-01", factEnd: "2026-06-01" }], resultsHistory: ["Релиз успешен, экономия ФОТ"], deadline: "2026-06-01", startDate: "2026-05-22" },
     { id: 28, project: "Снятие", name: "Признак автозаданий на снятие по сигналу замены товара на сборке", status: "Выполнено", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "2026-05-27", planEnd: "2026-06-01", factEnd: "2026-06-01" }], resultsHistory: ["Оптимизация автозаданий на 15%"], deadline: "2026-06-05", startDate: "2026-05-27" },
     { id: 29, project: "WMS MOBILE", name: "Инвентаризация Рефакторинг", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "Mobile", dev: "Сухоруков Роман", estimateDays: 10, planStart: "2026-03-03", planEnd: "2026-03-10", factEnd: "2026-03-10" }], resultsHistory: ["Ускорение ТСД на 25%"], deadline: "2026-06-05", startDate: "2026-03-03" },
-    { id: 30, project: "Инвентаризация", name: "Поиск пропущенных вещей в ходе инвентаризации", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 10, planStart: "2026-03-01", planEnd: "2026-03-10", factEnd: "2026-03-10" }], resultsHistory: [], deadline: "2026-03-10", startDate: "2026-03-01" },
+    { id: 30, project: "Инвентаризация", name: "Поиск пропущенных вещей в ходе инвентаризации", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 10, planStart: "2025-08-30", planEnd: "2025-09-10", factEnd: "2025-09-10" }], resultsHistory: [], deadline: "2025-09-10", startDate: "2025-08-30" },
     { id: 31, project: "Инвентаризация", name: "Реализация автоматических заданий на инвентаризацию на уровне отдельного стеллажа вместо улицы", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 7, planStart: "2026-03-16", planEnd: "2026-03-25", factEnd: "2026-03-25" }], resultsHistory: [], deadline: "2026-06-15", startDate: "2026-03-16" },
     { id: 32, project: "WMS MOBILE", name: "Инвент КИЗ Рефакторинг", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "Mobile", dev: "Сухоруков Роман", estimateDays: 8, planStart: "2026-03-19", planEnd: "2026-03-28", factEnd: "2026-03-28" }], resultsHistory: [], deadline: "2026-06-16", startDate: "2026-03-19" },
     { id: 33, project: "Инвент КБТ", name: "Отключить проверку на тип инвента SHK", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 3, planStart: "2026-06-04", planEnd: "2026-06-07", factEnd: "2026-06-07" }], resultsHistory: ["Успешный запуск КБТ без ошибок"], deadline: "2026-06-17", startDate: "2026-06-04" },
@@ -88,12 +88,12 @@ export default function App() {
     { id: 46, project: "Инвент КИЗ", name: "Блокировка выдачи товара на Инвент КИЗ, если на него есть активное задание сборки", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Тарасов Алексей", estimateDays: 3, planStart: "2026-05-28", planEnd: "2026-05-31", factEnd: "2026-05-31" }], resultsHistory: [], deadline: "2026-07-22", startDate: "2026-05-28" },
     { id: 47, project: "Инвент КБТ", name: "Добавление типов МХ 1702, 1703, 1704 в тип задания на инвентаризацию МОНО", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 3, planStart: "2026-06-17", planEnd: "2026-06-20", factEnd: "2026-06-20" }], resultsHistory: [], deadline: "2026-06-20", startDate: "2026-06-17" },
     { id: 48, project: "Инвент КИЗ", name: "Актуализация стикера Инвент КИЗ в заданиях сотрудников после переклейки.", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Цветкова Арина", estimateDays: 3, planStart: "2026-07-02", planEnd: "2026-07-05", factEnd: "2026-07-05" }], resultsHistory: [], deadline: "2026-07-05", startDate: "2026-07-02" },
-    { id: 49, project: "Снятие", name: "Снятие по КИЗ", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 10, planStart: "2026-01-18", planEnd: "2026-01-28", factEnd: "2026-01-28" }], resultsHistory: [], deadline: "2026-01-28", startDate: "2026-01-18" },
+    { id: 49, project: "Снятие", name: "Снятие по КИЗ", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 10, planStart: "2025-11-18", planEnd: "2025-11-28", factEnd: "2025-11-28" }], resultsHistory: [], deadline: "2025-11-28", startDate: "2025-11-18" },
     { id: 50, project: "Инвентаризация", name: "Изменение удаления заданий на инвент МХ", status: "Выполнено", priority: "Низкий", dependsOn: null, roles: [{ role: "DB", dev: "Цветкова Арина", estimateDays: 5, planStart: "2026-06-01", planEnd: "2026-06-10", factEnd: "2026-06-10" }], resultsHistory: [], deadline: "2026-06-10", startDate: "2026-06-01" }
   ];
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_light_v24');
+    const saved = localStorage.getItem('wms_hub_light_v25');
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
@@ -112,9 +112,9 @@ export default function App() {
     status: 'Бэклог',
     priority: 'Средний',
     dependsOn: '',
-    startDate: '2026-08-01',
+    startDate: '2025-09-01',
     deadline: '2026-12-31',
-    roles: [{ role: 'Backend', dev: 'Брянцев Александр', estimateDays: 5, planStart: '2026-08-01', planEnd: '2026-08-10', factEnd: '' }],
+    roles: [{ role: 'Backend', dev: 'Брянцев Александр', estimateDays: 5, planStart: '2025-09-01', planEnd: '2025-09-10', factEnd: '' }],
     resultsHistoryInput: ''
   });
 
@@ -125,7 +125,7 @@ export default function App() {
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('wms_hub_light_v24', JSON.stringify(tasks));
+    localStorage.setItem('wms_hub_light_v25', JSON.stringify(tasks));
   }, [tasks]);
 
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function App() {
 
   const handleResetToExcel = () => {
     setTasks(initial50Tasks);
-    localStorage.setItem('wms_hub_light_v24', JSON.stringify(initial50Tasks));
+    localStorage.setItem('wms_hub_light_v25', JSON.stringify(initial50Tasks));
   };
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
@@ -189,9 +189,9 @@ export default function App() {
       status: 'Бэклог',
       priority: 'Средний',
       dependsOn: '',
-      startDate: '2026-08-01',
+      startDate: '2025-09-01',
       deadline: '2026-12-31',
-      roles: [{ role: 'Backend', dev: 'Брянцев Александр', estimateDays: 5, planStart: '2026-08-01', planEnd: '2026-08-10', factEnd: '' }],
+      roles: [{ role: 'Backend', dev: 'Брянцев Александр', estimateDays: 5, planStart: '2025-09-01', planEnd: '2025-09-10', factEnd: '' }],
       resultsHistoryInput: ''
     });
     setIsModalOpen(false);
@@ -205,7 +205,7 @@ export default function App() {
       status: task.status,
       priority: task.priority,
       dependsOn: task.dependsOn || '',
-      startDate: task.startDate || task.roles?.[0]?.planStart || '2026-08-01',
+      startDate: task.startDate || task.roles?.[0]?.planStart || '2025-09-01',
       deadline: task.deadline || '2026-12-31',
       roles: task.roles || [],
       resultsHistoryInput: ''
@@ -224,7 +224,7 @@ export default function App() {
   const handleAddRoleRow = () => {
     setFormData({
       ...formData,
-      roles: [...formData.roles, { role: 'DB', dev: 'Голик Егор', estimateDays: 3, planStart: '2026-08-01', planEnd: '2026-08-05', factEnd: '' }]
+      roles: [...formData.roles, { role: 'DB', dev: 'Голик Егор', estimateDays: 3, planStart: '2025-09-01', planEnd: '2025-09-05', factEnd: '' }]
     });
   };
 
@@ -304,7 +304,7 @@ export default function App() {
           return hasDateMatch;
         });
 
-        reply = `📅 **Сводка по ${qNum} кварталу 2026 года:**\n- Найдено задач за этот период: **${qTasks.length}**\n` +
+        reply = `📅 **Сводка по ${qNum} кварталу:**\n- Найдено задач за этот период: **${qTasks.length}**\n` +
           (qTasks.length > 0 ? qTasks.slice(0, 8).map(t => `• [${t.project}] **${t.name}** (Статус: ${t.status})`).join('\n') : 'Задач за этот период не найдено.');
       }
       else if (lower.includes('метрик') || lower.includes('эффект') || lower.includes('профит') || lower.includes('срез') || lower.includes('экономи')) {
@@ -381,13 +381,13 @@ export default function App() {
     }
   });
 
-  // Вспомогательная функция для расчета динамической ширины и отступа полосы Ганта (таймлайн с 2026-01-01 по 2026-12-31)
+  // Расчет динамической шкалы Ганта с диапазоном от 2025-07-01 по 2026-12-31
   const getGanttBarStyles = (startStr, endStr) => {
-    const timelineStart = new Date('2026-01-01').getTime();
+    const timelineStart = new Date('2025-07-01').getTime();
     const timelineEnd = new Date('2026-12-31').getTime();
     const totalDuration = timelineEnd - timelineStart;
 
-    const sDate = new Date(startStr || '2026-01-01').getTime();
+    const sDate = new Date(startStr || '2025-09-01').getTime();
     const eDate = new Date(endStr || '2026-12-31').getTime();
 
     const clampedStart = Math.max(timelineStart, Math.min(timelineEnd, sDate));
@@ -633,11 +633,11 @@ export default function App() {
             </div>
           )}
 
-          {/* НАСТОЯЩИЙ ГАНТ С ФИКСИРОВАННЫМИ ДАТАМИ СВЕРХУ И ДИНАМИЧЕСКИМИ ПОЛОСАМИ */}
+          {/* НАСТОЯЩИЙ ГАНТ С ЯВНЫМ РАЗГРАНИЧЕНИЕМ ПО ГОДАМ И ФИКСИРОВАННОЙ ШАПКОЙ */}
           {activeTab === 'gantt' && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
               <div className="flex justify-between items-center border-b border-slate-200 pb-4">
-                <h3 className="text-lg font-bold text-slate-800">📊 ГАНТ ПО ЗАДАЧАМ (2026)</h3>
+                <h3 className="text-lg font-bold text-slate-800">📊 ГАНТ ПО ЗАДАЧАМ (2025 - 2026)</h3>
                 <div className="flex items-center gap-4 text-xs text-slate-600 font-medium">
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-emerald-500"></span> Выполнено</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-[#cb11ab]"></span> В работе</span>
@@ -646,15 +646,32 @@ export default function App() {
 
               {/* Обертка с вертикальным и горизонтальным скроллом */}
               <div className="overflow-auto max-h-[650px] border border-slate-200 rounded-xl relative shadow-sm">
-                <div className="min-w-[1600px]">
-                  {/* Зафиксированная шапка с месяцами сверху при прокрутке */}
-                  <div className="grid grid-cols-12 bg-slate-100 border-b border-slate-200 text-[11px] font-bold text-slate-700 text-center py-3 items-center sticky top-0 z-40 shadow-sm">
-                    <div className="w-80 text-left pl-4 sticky left-0 bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Проект & Задача</div>
-                    <div className="w-32 sticky left-80 bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Статус</div>
-                    
-                    <div className="col-span-8 grid grid-cols-12 text-[10px] text-slate-600 font-mono">
-                      <span>Янв</span><span>Фев</span><span>Мар</span><span>Апр</span><span>Май</span><span>Июн</span>
-                      <span>Июл</span><span>Авг</span><span>Сен</span><span>Окт</span><span>Ноя</span><span>Дек</span>
+                <div className="min-w-[2000px]">
+                  {/* Зафиксированная шапка сверху с разделением на 2025 и 2026 годы */}
+                  <div className="sticky top-0 z-40 bg-slate-100 border-b border-slate-300 shadow-sm">
+                    {/* Строка годов с явной линией разделения */}
+                    <div className="grid grid-cols-12 text-xs font-bold text-slate-800 text-center py-1.5 border-b border-slate-200">
+                      <div className="w-80 text-left pl-4 sticky left-0 bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Проект & Задача</div>
+                      <div className="w-32 sticky left-80 bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Статус</div>
+                      
+                      <div className="col-span-8 grid grid-cols-18 text-xs font-bold">
+                        <div className="col-span-6 border-r-2 border-[#cb11ab] bg-[#cb11ab]/10 text-[#cb11ab] py-1">📅 2025 ГОД (Июль — Декабрь)</div>
+                        <div className="col-span-12 bg-emerald-50 text-emerald-800 py-1">📅 2026 ГОД (Январь — Декабрь)</div>
+                      </div>
+                    </div>
+
+                    {/* Строка месяцев */}
+                    <div className="grid grid-cols-12 text-[10px] font-bold text-slate-600 text-center py-2 items-center">
+                      <div className="w-80 text-left pl-4 sticky left-0 bg-slate-100 z-50"></div>
+                      <div className="w-32 sticky left-80 bg-slate-100 z-50"></div>
+                      
+                      <div className="col-span-8 grid grid-cols-18 font-mono">
+                        {/* 2025 */}
+                        <span>Июл</span><span>Авг</span><span>Сен</span><span>Окт</span><span>Ноя</span><span className="border-r-2 border-[#cb11ab]">Дек</span>
+                        {/* 2026 */}
+                        <span>Янв</span><span>Фев</span><span>Мар</span><span>Апр</span><span>Май</span><span>Июн</span>
+                        <span>Июл</span><span>Авг</span><span>Сен</span><span>Окт</span><span>Ноя</span><span>Дек</span>
+                      </div>
                     </div>
                   </div>
 
@@ -663,7 +680,7 @@ export default function App() {
                     {filteredTasks.map(t => {
                       const isDone = t.status === 'Выполнено';
                       const isInProgress = t.status === 'В работе' || t.status === 'Тестирование';
-                      const barStyle = getGanttBarStyles(t.startDate || '2026-01-01', t.deadline || '2026-12-31');
+                      const barStyle = getGanttBarStyles(t.startDate || '2025-09-01', t.deadline || '2026-12-31');
 
                       return (
                         <div key={t.id} className="grid grid-cols-12 items-center text-xs py-2.5 px-2 hover:bg-slate-50 transition-colors">
@@ -678,12 +695,15 @@ export default function App() {
                             }`}>{t.status}</span>
                           </div>
 
-                          {/* Динамическая шкала Ганта с индивидуальной длиной полосы */}
+                          {/* Динамическая шкала Ганта с линией разграничения 2025/2026 */}
                           <div className="col-span-8 relative bg-slate-50 h-7 rounded-lg flex items-center px-1 border border-slate-200 ml-4 overflow-hidden">
-                            <div className={`absolute h-4 rounded-md shadow-sm transition-all ${
+                            {/* Вертикальная линия разделения годов на фоне */}
+                            <div className="absolute top-0 bottom-0 left-[33.33%] w-[2px] bg-[#cb11ab]/30 z-0"></div>
+
+                            <div className={`absolute h-4 rounded-md shadow-sm z-10 transition-all ${
                               isDone ? 'bg-emerald-500' : isInProgress ? 'bg-[#cb11ab]' : 'bg-amber-400'
                             }`} style={barStyle}></div>
-                            <span className="relative z-10 text-[10px] font-mono text-slate-700 pl-2 font-bold bg-white/70 px-1 rounded">
+                            <span className="relative z-20 text-[10px] font-mono text-slate-700 pl-2 font-bold bg-white/80 px-1 rounded">
                               {t.startDate ? `${t.startDate} → ` : ''}{t.deadline}
                             </span>
                           </div>
