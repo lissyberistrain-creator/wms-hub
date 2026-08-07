@@ -1,32 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  LayoutDashboard, 
-  FolderKanban, 
-  Users, 
-  Bot, 
-  Plus, 
-  Trash2, 
-  Edit3, 
-  Send, 
-  Loader2, 
-  BarChart2, 
-  RefreshCw,
-  User,
-  Kanban,
-  Settings,
-  Calendar,
-  Link2,
-  FileText,
-  MessageSquare,
-  Info,
-  Clock,
-  Bold,
-  Italic,
-  List,
-  ListOrdered,
-  Heading1,
-  Heading2,
-  Quote
+  LayoutDashboard, FolderKanban, Users, Bot, Plus, Trash2, Edit3, Send, Loader2, BarChart2, RefreshCw,
+  User, Kanban, Settings, Calendar, Link2, FileText, MessageSquare, Info, Clock, Bold, Italic, 
+  List, ListOrdered, Heading1, Heading2, Quote, AlertTriangle, ChevronDown, ChevronRight
 } from 'lucide-react';
 
 export default function App() {
@@ -39,72 +15,69 @@ export default function App() {
   const [taskModalTab, setTaskModalTab] = useState('chat');
   const [newCommentText, setNewCommentText] = useState('');
 
-  // Вкладка "Ссылки для работы"
-  const [workLinks, setWorkLinks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_links_v1');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) { /* ignore */ }
-    }
-    return [
-      { id: 1, name: 'Camunda Workflow', url: 'https://camunda.com', description: 'Схемы бизнес-процессов WMS' },
-      { id: 2, name: 'Confluence WMS', url: 'https://confluence.incubator.local', description: 'Функциональные требования и ТСД' },
-      { id: 3, name: 'Grafana Мониторинг', url: 'https://grafana.incubator.local', description: 'Метрики очередей и складов' }
-    ];
-  });
-  const [newLinkModal, setNewLinkModal] = useState(false);
-  const [linkForm, setLinkForm] = useState({ name: '', url: '', description: '' });
+  // Состояние свернутых заметок (по умолчанию свернуты)
+  const [expandedNotes, setExpandedNotes] = useState({});
 
-  // Вкладка "Заметки и задачник"
-  const [notesList, setNotesList] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_notes_v3');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) { /* ignore */ }
-    }
-    return [
-      { id: 1, title: 'Встреча с Егором', date: '2026-05-28', completed: true, htmlContent: '<div>1) Арина (проверка сдачи хп инвентаризации) - завести карточки</div><div>2) Подключение складов к авто заданиям</div><div>3) Отчет общие показатели</div>' },
-      { id: 2, title: 'Контроль выполнения задач', date: '2026-08-07', completed: false, htmlContent: '<div>Проверить раскатку снятия вещей после рефакторинга ТСД.</div>' }
-    ];
-  });
-  const [newNoteTitle, setNewNoteTitle] = useState('');
-  const [newNoteDate, setNewNoteDate] = useState(new Date().toISOString().split('T')[0]);
-
-  const [roleDevelopers, setRoleDevelopers] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_roles_v1');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) { /* ignore */ }
-    }
-    return {
-      'Analyst': ['Фроленков Денис', 'Гузенко Антон'],
-      'DB': ['Голик Егор', 'Тарасов Алексей', 'Цветкова Арина'],
-      'Backend': ['Брянцев Александр'],
-      'Frontend': ['Сергей'],
-      'OLAP': ['Довгань Алексей'],
-      'Mobile': ['Сухоруков Роман', 'Вавулин Елисей'],
-      'Testing': ['Склад', 'QA Отдел']
-    };
-  });
-
-  const [newDevName, setNewDevName] = useState('');
-  const [selectedRoleForNewDev, setSelectedRoleForNewDev] = useState('Backend');
-
-  const initial50Tasks = [
+  // Полная база из 50 задач
+  const full50Tasks = [
     { id: 1, project: "WMS MOBILE", name: "Снятие Рефакторинг", status: "Тестирование", priority: "Высокий", dependsOn: null, roles: [{ role: "Mobile", dev: "Сухоруков Роман", estimateDays: 10, planStart: "2026-04-01", planEnd: "2026-05-05", factEnd: "" }], resultsHistory: ["Успешный прогон автотестов рефакторинга"], deadline: "2026-08-10", startDate: "2026-04-01", comments: [{ author: "Фроленков Денис", text: "Ждем результаты тестирования на складе", time: "05.08.2026 12:40" }], description: "Рефакторинг модуля снятия с ТСД для ускорения отклика." },
     { id: 2, project: "Поиск", name: "Модуль поиска списанных вещей", status: "В работе", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 10, planStart: "2026-07-31", planEnd: "2026-08-03", factEnd: "" }], resultsHistory: [], deadline: "2026-08-10", startDate: "2026-07-31", comments: [], description: "Разработка таблиц БД и API поиска списанных позиций." },
     { id: 3, project: "Инвентаризация", name: "Сервис для валидации ШК", status: "В работе", priority: "Высокий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "2026-07-31", planEnd: "2026-08-05", factEnd: "" }], resultsHistory: [], deadline: "2026-08-05", startDate: "2026-07-31", comments: [], description: "Валидация штрихкодов перед инвентаризационными заданиями." },
     { id: 4, project: "Отчетность", name: "Переработка отчёта \"Общие показатели инвентаризации\"", status: "В работе", priority: "Средний", dependsOn: null, roles: [{ role: "OLAP", dev: "Довгань Алексей", estimateDays: 14, planStart: "2026-05-08", planEnd: "2026-05-11", factEnd: "" }], resultsHistory: [], deadline: "2026-08-25", startDate: "2026-05-08", comments: [], description: "Обновление OLAP кубов для отчета." },
     { id: 5, project: "Инвентаризация", name: "Точечная инвентаризация по УИН", status: "Бэклог", priority: "Высокий", dependsOn: null, roles: [{ role: "DB", dev: "Цветкова Арина", estimateDays: 2, planStart: "2026-07-31", planEnd: "2026-08-04", factEnd: "" }], resultsHistory: [], deadline: "2026-08-14", startDate: "2026-07-31", comments: [], description: "" },
+    { id: 6, project: "Инвентаризация", name: "Изменение условий отбора улиц для инвентаризации для низкооборачиваемых зон", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "OLAP", dev: "Гузенко Антон", estimateDays: 5, planStart: "2026-08-01", planEnd: "2026-08-10", factEnd: "" }], resultsHistory: [], deadline: "2026-08-10", startDate: "2026-08-01", comments: [], description: "" },
+    { id: 7, project: "Инвентаризация", name: "Покрытие авто заданиями площадок сейф/супер сейф/питание", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "OLAP", dev: "Гузенко Антон", estimateDays: 5, planStart: "2026-08-01", planEnd: "2026-08-10", factEnd: "" }], resultsHistory: [], deadline: "2026-08-10", startDate: "2026-08-01", comments: [], description: "" },
+    { id: 8, project: "Саппорт", name: "Проливка заданий на Инвент КИЗ через wh support", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 3, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-10-31", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 9, project: "Поиск", name: "Верификация МХ при пропуске товара в модулях «Поиск вещей» и «Инвент КИЗ»", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 4, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-10-31", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 10, project: "Инвентаризация", name: "Изменение в передачи данных при выгрузке", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 3, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-10-31", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 11, project: "Поиск", name: "Фото товара в поиске", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Frontend", dev: "Сергей", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-10-31", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 12, project: "Саппорт", name: "Проливка заданий на Поиск через саппорт", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 3, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-10-31", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 13, project: "Снятие", name: "Актуальный объём при уплотнении", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Analyst", dev: "Гузенко Антон", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-10-31", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 14, project: "Снятие", name: "Группировка заданий на снятие от сервиса", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-10-31", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 15, project: "Поиск", name: "Идентификация пустых отсканированных стикеров", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-10-31", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 16, project: "Снятие", name: "Исключение пустых МХ из заданий на снятие с палет", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-10-31", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 17, project: "Инвентаризация", name: "Авто-печать этикеток МХ", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 18, project: "Мусорные данные", name: "Мусорные данные → превентивный инвент", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 19, project: "Снятие", name: "Адаптивный подход к снятию", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 20, project: "Саппорт", name: "Признак \"Супер сейф\"", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 21, project: "Саппорт", name: "Создание заданий на инвент КБТ по заявкам", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 22, project: "Саппорт", name: "Ограничение для формирования авто задач в модуле снятие по предметам", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01", comments: [], description: "" },
     { id: 23, project: "Инвентаризация", name: "Сквозной идентификатор заданий на инвент", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 10, planStart: "2026-08-01", planEnd: "2026-09-15", factEnd: "" }], resultsHistory: [], deadline: "2026-09-15", startDate: "2026-08-01", comments: [], description: "" },
-    { id: 27, project: "Снятие", name: "Отключение оплаты за снятие стикерованного товара с паллет", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 3, planStart: "2026-05-22", planEnd: "2026-06-01", factEnd: "2026-06-01" }], resultsHistory: ["Релиз успешен, экономия ФОТ"], deadline: "2026-06-01", startDate: "2026-05-22", comments: [], description: "" },
+    { id: 24, project: "Инвентаризация", name: "Объединение процессов Инвентаризации", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 25, project: "Снятие", name: "Указывать тип подбора после скана баркода", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 26, project: "Инвентаризация", name: "Отдельный параметр сдачи заданий на инвент", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01", comments: [], description: "" },
+    { id: 27, project: "Снятие", name: "Отключение оплаты за снятие стикерованного товара с паллет в модуле «Снятие в сетку по заданию»", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 3, planStart: "2026-05-22", planEnd: "2026-06-01", factEnd: "2026-06-01" }], resultsHistory: ["Релиз успешен, экономия ФОТ"], deadline: "2026-06-01", startDate: "2026-05-22", comments: [], description: "" },
+    { id: 28, project: "Снятие", name: "Признак автозаданий на снятие по сигналу замены товара на сборке", status: "Выполнено", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "2026-05-27", planEnd: "2026-06-01", factEnd: "2026-06-01" }], resultsHistory: ["Оптимизация автозаданий на 15%"], deadline: "2026-06-05", startDate: "2026-05-27", comments: [], description: "" },
+    { id: 29, project: "WMS MOBILE", name: "Инвентаризация Рефакторинг", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "Mobile", dev: "Сухоруков Роман", estimateDays: 10, planStart: "2026-03-03", planEnd: "2026-03-10", factEnd: "2026-03-10" }], resultsHistory: ["Ускорение ТСД на 25%"], deadline: "2026-06-05", startDate: "2026-03-03", comments: [], description: "" },
     { id: 30, project: "Инвентаризация", name: "Поиск пропущенных вещей в ходе инвентаризации", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 10, planStart: "2025-08-30", planEnd: "2025-09-10", factEnd: "2025-09-10" }], resultsHistory: [], deadline: "2025-09-10", startDate: "2025-08-30", comments: [], description: "" },
-    { id: 49, project: "Снятие", name: "Снятие по КИЗ", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 10, planStart: "2025-11-18", planEnd: "2025-11-28", factEnd: "2025-11-28" }], resultsHistory: [], deadline: "2025-11-28", startDate: "2025-11-18", comments: [], description: "" }
+    { id: 31, project: "Инвентаризация", name: "Реализация автоматических заданий на инвентаризацию на уровне отдельного стеллажа вместо улицы", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 7, planStart: "2026-03-16", planEnd: "2026-03-25", factEnd: "2026-03-25" }], resultsHistory: [], deadline: "2026-06-15", startDate: "2026-03-16", comments: [], description: "" },
+    { id: 32, project: "WMS MOBILE", name: "Инвент КИЗ Рефакторинг", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "Mobile", dev: "Сухоруков Роман", estimateDays: 8, planStart: "2026-03-19", planEnd: "2026-03-28", factEnd: "2026-03-28" }], resultsHistory: [], deadline: "2026-06-16", startDate: "2026-03-19", comments: [], description: "" },
+    { id: 33, project: "Инвент КБТ", name: "Отключить проверку на тип инвента SHK", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 3, planStart: "2026-06-04", planEnd: "2026-06-07", factEnd: "2026-06-07" }], resultsHistory: ["Успешный запуск КБТ без ошибок"], deadline: "2026-06-17", startDate: "2026-06-04", comments: [], description: "" },
+    { id: 34, project: "Снятие", name: "Валидация наличия буфера «Задания на раскладку» перед выдачей задания на снятие", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 5, planStart: "2026-02-01", planEnd: "2026-02-06", factEnd: "2026-02-06" }], resultsHistory: [], deadline: "2026-06-17", startDate: "2026-02-01", comments: [], description: "" },
+    { id: 35, project: "Инвентаризация", name: "Не проставляется номер отсканированного короба \"Инвент по листу\" для обезличенного товара UGI", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "2026-06-10", planEnd: "2026-06-15", factEnd: "2026-06-15" }], resultsHistory: [], deadline: "2026-06-18", startDate: "2026-06-10", comments: [], description: "" },
+    { id: 36, project: "Инвент КБТ", name: "Изменение начислений оплаты по операции 9001", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 5, planStart: "2026-05-22", planEnd: "2026-05-28", factEnd: "2026-05-28" }], resultsHistory: [], deadline: "2026-06-25", startDate: "2026-05-22", comments: [], description: "" },
+    { id: 37, project: "Снятие", name: "Повторное использование тары при снятии на блоках с типом SSF", status: "Выполнено", priority: "Высокий", dependsOn: null, roles: [{ role: "DB", dev: "Цветкова Арина", estimateDays: 5, planStart: "2026-06-18", planEnd: "2026-06-23", factEnd: "2026-06-23" }], resultsHistory: [], deadline: "2026-06-25", startDate: "2026-06-18", comments: [], description: "" },
+    { id: 38, project: "Инвентаризация", name: "Изменение в логике проверки надобности авто заданий", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "OLAP", dev: "Гузенко Антон", estimateDays: 4, planStart: "2026-06-25", planEnd: "2026-06-29", factEnd: "2026-06-29" }], resultsHistory: [], deadline: "2026-06-29", startDate: "2026-06-25", comments: [], description: "" },
+    { id: 39, project: "Инвентаризация", name: "Передача данных об инвенте в инвент МХ", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Тарасов Алексей", estimateDays: 4, planStart: "2026-06-26", planEnd: "2026-06-30", factEnd: "2026-06-30" }], resultsHistory: [], deadline: "2026-06-30", startDate: "2026-06-26", comments: [], description: "" },
+    { id: 40, project: "WMS MOBILE", name: "Сообщение о прохождении обучения", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "Mobile", dev: "Вавулин Елисей", estimateDays: 4, planStart: "2026-06-26", planEnd: "2026-06-30", factEnd: "2026-06-30" }], resultsHistory: [], deadline: "2026-06-30", startDate: "2026-06-26", comments: [], description: "" },
+    { id: 41, project: "Саппорт", name: "Полный переход на саппорт", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "2026-06-27", planEnd: "2026-07-02", factEnd: "2026-07-02" }], resultsHistory: [], deadline: "2026-07-02", startDate: "2026-06-27", comments: [], description: "" },
+    { id: 42, project: "Инвентаризация", name: "Ограничение формирования авто-заданий на инвентаризацию по типу мест хранения", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 5, planStart: "2026-03-01", planEnd: "2026-03-06", factEnd: "2026-03-06" }], resultsHistory: [], deadline: "2026-07-02", startDate: "2026-03-01", comments: [], description: "" },
+    { id: 43, project: "Инвентаризация", name: "Добавление нового статуса IAR", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 5, planStart: "2026-05-01", planEnd: "2026-05-06", factEnd: "2026-05-06" }], resultsHistory: [], deadline: "2026-07-05", startDate: "2026-05-01", comments: [], description: "" },
+    { id: 44, project: "Инвентаризация", name: "Конфликт зон заданий в ходе инвентаризации", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 2, planStart: "2026-05-14", planEnd: "2026-05-16", factEnd: "2026-05-16" }], resultsHistory: [], deadline: "2026-07-16", startDate: "2026-05-14", comments: [], description: "" },
+    { id: 45, project: "Инвент КИЗ", name: "Изменение действий в случае если товар упакован в модуле \"Инвент КИЗ\"", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 2, planStart: "2026-05-14", planEnd: "2026-05-16", factEnd: "2026-05-16" }], resultsHistory: [], deadline: "2026-07-16", startDate: "2026-05-14", comments: [], description: "" },
+    { id: 46, project: "Инвент КИЗ", name: "Блокировка выдачи товара на Инвент КИЗ, если на него есть активное задание сборки", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Тарасов Алексей", estimateDays: 3, planStart: "2026-05-28", planEnd: "2026-05-31", factEnd: "2026-05-31" }], resultsHistory: [], deadline: "2026-07-22", startDate: "2026-05-28", comments: [], description: "" },
+    { id: 47, project: "Инвент КБТ", name: "Добавление типов МХ 1702, 1703, 1704 в тип задания на инвентаризацию МОНО", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 3, planStart: "2026-06-17", planEnd: "2026-06-20", factEnd: "2026-06-20" }], resultsHistory: [], deadline: "2026-06-20", startDate: "2026-06-17", comments: [], description: "" },
+    { id: 48, project: "Инвент КИЗ", name: "Актуализация стикера Инвент КИЗ в заданиях сотрудников после переклейки.", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Цветкова Арина", estimateDays: 3, planStart: "2026-07-02", planEnd: "2026-07-05", factEnd: "2026-07-05" }], resultsHistory: [], deadline: "2026-07-05", startDate: "2026-07-02", comments: [], description: "" },
+    { id: 49, project: "Снятие", name: "Снятие по КИЗ", status: "Выполнено", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 10, planStart: "2025-11-18", planEnd: "2025-11-28", factEnd: "2025-11-28" }], resultsHistory: [], deadline: "2025-11-28", startDate: "2025-11-18", comments: [], description: "" },
+    { id: 50, project: "Инвентаризация", name: "Изменение удаления заданий на инвент МХ", status: "Выполнено", priority: "Низкий", dependsOn: null, roles: [{ role: "DB", dev: "Цветкова Арина", estimateDays: 5, planStart: "2026-06-01", planEnd: "2026-06-10", factEnd: "2026-06-10" }], resultsHistory: [], deadline: "2026-06-10", startDate: "2026-06-01", comments: [], description: "" }
   ];
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_light_v29');
+    const saved = localStorage.getItem('wms_hub_light_v31');
     if (saved) {
-      try { const parsed = JSON.parse(saved); if (parsed && Array.isArray(parsed)) return parsed; } catch (e) { /* ignore */ }
+      try { const parsed = JSON.parse(saved); if (parsed && Array.isArray(parsed) && parsed.length > 0) return parsed; } catch (e) { /* ignore */ }
     }
-    return initial50Tasks;
+    return full50Tasks;
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -123,20 +96,58 @@ export default function App() {
     description: ''
   });
 
+  // Вкладка "Ссылки для работы"
+  const [workLinks, setWorkLinks] = useState(() => {
+    const saved = localStorage.getItem('wms_hub_links_v1');
+    return saved ? JSON.parse(saved) : [
+      { id: 1, name: 'Camunda Workflow', url: 'https://camunda.com', description: 'Схемы бизнес-процессов WMS' },
+      { id: 2, name: 'Confluence WMS', url: 'https://confluence.incubator.local', description: 'Функциональные требования и ТСД' }
+    ];
+  });
+  const [newLinkModal, setNewLinkModal] = useState(false);
+  const [linkForm, setLinkForm] = useState({ name: '', url: '', description: '' });
+
+  // Вкладка "Заметки и задачник" (сворачиваемые по умолчанию)
+  const [notesList, setNotesList] = useState(() => {
+    const saved = localStorage.getItem('wms_hub_notes_v5');
+    return saved ? JSON.parse(saved) : [
+      { id: 1, title: 'Встреча с Егором', date: '2026-05-28', completed: true, htmlContent: '<ol><li>Арина (проверка сдачи хп инвентаризации) - завести карточки</li><li>Подключение складов к авто заданиям</li><li>Отчет общие показатели</li></ol>' },
+      { id: 2, title: 'Контроль выполнения задач', date: '2026-08-07', completed: false, htmlContent: '<div>Проверить раскатку снятия вещей после рефакторинга ТСД.</div>' }
+    ];
+  });
+  const [newNoteTitle, setNewNoteTitle] = useState('');
+  const [newNoteDate, setNewNoteDate] = useState(new Date().toISOString().split('T')[0]);
+
+  const [roleDevelopers, setRoleDevelopers] = useState(() => {
+    const saved = localStorage.getItem('wms_hub_roles_v1');
+    return saved ? JSON.parse(saved) : {
+      'Analyst': ['Фроленков Денис', 'Гузенко Антон'],
+      'DB': ['Голик Егор', 'Тарасов Алексей', 'Цветкова Арина'],
+      'Backend': ['Брянцев Александр'],
+      'Frontend': ['Сергей'],
+      'OLAP': ['Довгань Алексей'],
+      'Mobile': ['Сухоруков Роман', 'Вавулин Елисей'],
+      'Testing': ['Склад', 'QA Отдел']
+    };
+  });
+
+  const [newDevName, setNewDevName] = useState('');
+  const [selectedRoleForNewDev, setSelectedRoleForNewDev] = useState('Backend');
+
   const [chatMessages, setChatMessages] = useState([
     { role: 'assistant', content: 'Привет! Я ИИ-ассистент WMS Hub. Спрашивайте про просрочки ("Найди просрочки"), кварталы, проекты или пишите "Создай задачу: [название]".' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  useEffect(() => { localStorage.setItem('wms_hub_light_v29', JSON.stringify(tasks)); }, [tasks]);
+  useEffect(() => { localStorage.setItem('wms_hub_light_v31', JSON.stringify(tasks)); }, [tasks]);
   useEffect(() => { localStorage.setItem('wms_hub_roles_v1', JSON.stringify(roleDevelopers)); }, [roleDevelopers]);
   useEffect(() => { localStorage.setItem('wms_hub_links_v1', JSON.stringify(workLinks)); }, [workLinks]);
-  useEffect(() => { localStorage.setItem('wms_hub_notes_v3', JSON.stringify(notesList)); }, [notesList]);
+  useEffect(() => { localStorage.setItem('wms_hub_notes_v5', JSON.stringify(notesList)); }, [notesList]);
 
   const handleResetToExcel = () => {
-    setTasks(initial50Tasks);
-    localStorage.setItem('wms_hub_light_v29', JSON.stringify(initial50Tasks));
+    setTasks(full50Tasks);
+    localStorage.setItem('wms_hub_light_v31', JSON.stringify(full50Tasks));
   };
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
@@ -227,39 +238,12 @@ export default function App() {
     setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
   };
 
-  // Drag and Drop
   const handleDragStart = (e, taskId) => { e.dataTransfer.setData('text/plain', taskId); };
   const handleDragOver = (e) => { e.preventDefault(); };
   const handleDrop = (e, targetStatus) => {
     e.preventDefault();
     const taskId = Number(e.dataTransfer.getData('text/plain'));
     if (taskId) { setTasks(tasks.map(t => t.id === taskId ? { ...t, status: targetStatus } : t)); }
-  };
-
-  const handleAddRoleRow = () => {
-    setFormData({
-      ...formData,
-      roles: [...formData.roles, { role: 'DB', dev: 'Голик Егор', estimateDays: 3, planStart: '2026-08-01', planEnd: '2026-08-05', factEnd: '' }]
-    });
-  };
-
-  const handleRemoveRoleRow = (index) => {
-    setFormData({ ...formData, roles: formData.roles.filter((_, i) => i !== index) });
-  };
-
-  const handleAddComment = (e) => {
-    e.preventDefault();
-    if (!newCommentText.trim() || !selectedTaskForModal) return;
-    const newComment = { author: 'Фроленков Денис', text: newCommentText.trim(), time: new Date().toLocaleString() };
-    const updatedTasks = tasks.map(t => {
-      if (t.id === selectedTaskForModal.id) {
-        return { ...t, comments: [...(t.comments || []), newComment] };
-      }
-      return t;
-    });
-    setTasks(updatedTasks);
-    setSelectedTaskForModal(prev => ({ ...prev, comments: [...(prev.comments || []), newComment] }));
-    setNewCommentText('');
   };
 
   const getTotalTaskDays = (task) => {
@@ -270,7 +254,6 @@ export default function App() {
     return '5 дн.';
   };
 
-  // Команды для форматирования в редакторе заметки через execCommand
   const applyExecCommand = (command, value = null) => {
     document.execCommand(command, false, value);
   };
@@ -311,32 +294,6 @@ export default function App() {
     { title: '✅ Выполнено', status: 'Выполнено', color: 'border-emerald-300 bg-emerald-50 text-emerald-800' }
   ];
 
-  const allDevsList = [];
-  Object.entries(roleDevelopers).forEach(([roleName, devsArray]) => {
-    devsArray.forEach(d => { allDevsList.push({ name: d, role: roleName }); });
-  });
-
-  const devAnalytics = {};
-  allDevsList.forEach(item => {
-    devAnalytics[item.name] = { role: item.role, totalTasks: 0, completedTasks: 0, inProgressTasks: 0, backlogTasks: 0, totalDays: 0, projects: new Set() };
-  });
-
-  tasks.forEach(t => {
-    if (Array.isArray(t.roles)) {
-      t.roles.forEach(r => {
-        if (r && r.dev && devAnalytics[r.dev]) {
-          const stats = devAnalytics[r.dev];
-          stats.totalTasks += 1;
-          stats.totalDays += Number(r.estimateDays) || 0;
-          stats.projects.add(t.project);
-          if (t.status === 'Выполнено') stats.completedTasks += 1;
-          else if (t.status === 'В работе' || t.status === 'Тестирование') stats.inProgressTasks += 1;
-          else stats.backlogTasks += 1;
-        }
-      });
-    }
-  });
-
   return (
     <div className="min-h-screen text-slate-900 flex font-sans relative overflow-x-hidden" style={{ background: '#f5f6f8' }}>
       <div className="absolute inset-0 pointer-events-none opacity-40 z-0" style={{
@@ -358,6 +315,7 @@ export default function App() {
           <button onClick={() => setActiveTab('kanban')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'kanban' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100'}`}><Kanban size={18} /> Канбан-доска</button>
           <button onClick={() => setActiveTab('dashboard')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'dashboard' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100'}`}><LayoutDashboard size={18} /> Таблица & План/Факт</button>
           <button onClick={() => setActiveTab('gantt')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'gantt' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100'}`}><FolderKanban size={18} /> Диаграмма Ганта</button>
+          <button onClick={() => setActiveTab('reminders')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'reminders' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100'}`}><Clock size={18} /> Напоминания и контроль</button>
           <button onClick={() => setActiveTab('links')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'links' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100'}`}><Link2 size={18} /> Ссылки для работы</button>
           <button onClick={() => setActiveTab('notes')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'notes' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100'}`}><FileText size={18} /> Заметки & Задачник</button>
           <button onClick={() => setActiveTab('analytics')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === 'analytics' ? 'bg-[#cb11ab] text-white shadow-md shadow-[#cb11ab]/20' : 'text-slate-600 hover:bg-slate-100'}`}><BarChart2 size={18} /> Аналитика & Команда</button>
@@ -373,7 +331,7 @@ export default function App() {
       </aside>
 
       <main className="flex-1 flex flex-col h-screen overflow-hidden z-10">
-        <header className="h-18 bg-white/80 backdrop-blur border-b border-slate-200 px-8 flex items-center justify-between shrink-0 shadow-sm">
+        <header className="h-18 bg-white/80 backdrop-blur border-b border-slate-200 px-8 flex items-center justify-between shrink-0 shadow-sm z-30">
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-slate-600">Проект:</span>
             <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)} className="bg-slate-100 border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#cb11ab]">
@@ -382,7 +340,12 @@ export default function App() {
             </select>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={handleResetToExcel} className="flex items-center gap-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-3.5 py-1.5 rounded-xl text-xs font-semibold shadow-sm transition-all">
+            {/* Кнопка с абсолютной кликабельностью */}
+            <button 
+              type="button"
+              onClick={handleResetToExcel} 
+              className="relative z-50 cursor-pointer flex items-center gap-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-3.5 py-1.5 rounded-xl text-xs font-semibold shadow-sm transition-all pointer-events-auto"
+            >
               <RefreshCw size={12} /> Загрузить все 50 задач
             </button>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -501,6 +464,54 @@ export default function App() {
                   </table>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* НАПОМИНАНИЯ И КОНТРОЛЬ СРОКОВ */}
+          {activeTab === 'reminders' && (
+            <div className="space-y-6 max-w-4xl">
+              <div>
+                <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2"><Clock className="text-[#cb11ab]" /> Напоминания и контроль сроков</h2>
+                <p className="text-xs text-slate-500 mt-1">Оперативный контроль горящих дедлайнов и просроченных задач</p>
+              </div>
+
+              {(() => {
+                const today = new Date().toISOString().split('T')[0];
+                const threeDaysLater = new Date();
+                threeDaysLater.setDate(threeDaysLater.getDate() + 3);
+                const deadlineDate = threeDaysLater.toISOString().split('T')[0];
+
+                const overdue = tasks.filter(t => t.status !== 'Выполнено' && t.deadline && t.deadline < today);
+                const burning = tasks.filter(t => t.status !== 'Выполнено' && t.deadline && t.deadline >= today && t.deadline <= deadlineDate);
+
+                return (
+                  <div className="space-y-6">
+                    <div className="bg-rose-50 border border-rose-200 p-5 rounded-2xl shadow-sm space-y-3">
+                      <h3 className="font-bold text-rose-800 flex items-center gap-2"><AlertTriangle size={18} /> Просроченные задачи ({overdue.length})</h3>
+                      {overdue.length === 0 ? <p className="text-xs text-rose-600 italic">Просрочек нет! Отличная работа.</p> : (
+                        overdue.map(t => (
+                          <div key={t.id} onClick={() => { setSelectedTaskForModal(t); setTaskModalTab('chat'); }} className="bg-white p-3 rounded-xl border border-rose-200 flex justify-between items-center text-xs cursor-pointer hover:border-rose-400">
+                            <div><span className="font-bold text-[#cb11ab]">[{t.project}]</span> <span className="font-semibold text-slate-800">{t.name}</span></div>
+                            <span className="font-mono font-bold text-rose-600">Дедлайн: {t.deadline}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+
+                    <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl shadow-sm space-y-3">
+                      <h3 className="font-bold text-amber-800 flex items-center gap-2"><Clock size={18} /> Горят сроки (дедлайн до {deadlineDate}) ({burning.length})</h3>
+                      {burning.length === 0 ? <p className="text-xs text-amber-700 italic">Срочных горящих задач на ближайшие 3 дня нет.</p> : (
+                        burning.map(t => (
+                          <div key={t.id} onClick={() => { setSelectedTaskForModal(t); setTaskModalTab('chat'); }} className="bg-white p-3 rounded-xl border border-amber-200 flex justify-between items-center text-xs cursor-pointer hover:border-amber-400">
+                            <div><span className="font-bold text-[#cb11ab]">[{t.project}]</span> <span className="font-semibold text-slate-800">{t.name}</span></div>
+                            <span className="font-mono font-bold text-amber-700">Дедлайн: {t.deadline}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
 
@@ -624,90 +635,67 @@ export default function App() {
             </div>
           )}
 
-          {/* ЗАМЕТКИ И ЗАДАЧНИК (С ПОЛНОЦЕННЫМ ВИЗУАЛЬНЫМ РЕДАКТОРОМ И ВЫБОРОМ ДАТЫ) */}
+          {/* ЗАМЕТКИ И ЗАДАЧНИК (СВОРАЧИВАЕМЫЕ ПО УМОЛЧАНИЮ) */}
           {activeTab === 'notes' && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 max-w-5xl">
               <div className="flex justify-between items-center border-b border-slate-200 pb-4">
                 <div>
                   <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2"><FileText className="text-[#cb11ab]" /> Общие заметки и задачник</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Ведите протоколы встреч, списки дел и продуктовые заметки с форматированием</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Ведите протоколы встреч, списки дел и продуктовые заметки</p>
                 </div>
               </div>
 
-              {/* Создание новой заметки */}
               <div className="flex gap-3 items-center bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                <input 
-                  type="date" 
-                  value={newNoteDate} 
-                  onChange={(e) => setNewNoteDate(e.target.value)} 
-                  className="bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono text-slate-800"
-                />
-                <input 
-                  type="text" 
-                  value={newNoteTitle} 
-                  onChange={(e) => setNewNoteTitle(e.target.value)} 
-                  placeholder="Заголовок задачи или встречи..." 
-                  className="flex-1 bg-white border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#cb11ab]"
-                />
+                <input type="date" value={newNoteDate} onChange={(e) => setNewNoteDate(e.target.value)} className="bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono text-slate-800" />
+                <input type="text" value={newNoteTitle} onChange={(e) => setNewNoteTitle(e.target.value)} placeholder="Заголовок задачи или встречи..." className="flex-1 bg-white border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#cb11ab]" />
                 <button onClick={() => {
                   if (!newNoteTitle.trim()) return;
-                  setNotesList([{ id: Date.now(), title: newNoteTitle.trim(), date: newNoteDate, completed: false, htmlContent: '<div>Введите текст заметки...</div>' }, ...notesList]);
+                  setNotesList([{ id: Date.now(), title: newNoteTitle.trim(), date: newNoteDate, completed: false, htmlContent: '<div>Введите текст...</div>' }, ...notesList]);
                   setNewNoteTitle('');
                 }} className="bg-[#cb11ab] hover:bg-[#b00f95] text-white px-5 py-2 rounded-xl text-sm font-semibold shadow-md flex items-center gap-1.5">
                   <Plus size={16} /> Создать
                 </button>
               </div>
 
-              {/* Список заметок с панелью форматирования */}
               <div className="space-y-4">
-                {notesList.map(note => (
-                  <div key={note.id} className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-3 shadow-sm">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-3">
-                        <input type="checkbox" checked={note.completed} onChange={() => setNotesList(notesList.map(n => n.id === note.id ? {...n, completed: !n.completed} : n))} className="w-4 h-4 accent-[#cb11ab] rounded cursor-pointer" />
-                        <span className={`font-bold text-sm ${note.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>{note.title}</span>
-                        <span className="text-xs font-mono bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-500 flex items-center gap-1">
-                          <Calendar size={12} className="text-[#cb11ab]" /> 
-                          <input 
-                            type="date" 
-                            value={note.date} 
-                            onChange={(e) => {
-                              const newD = e.target.value;
-                              setNotesList(notesList.map(n => n.id === note.id ? {...n, date: newD} : n));
-                            }}
-                            className="bg-transparent border-none text-xs font-mono text-slate-600 focus:outline-none cursor-pointer"
-                          />
-                        </span>
+                {notesList.map(note => {
+                  const isExpanded = !!expandedNotes[note.id];
+                  return (
+                    <div key={note.id} className="bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                      <div className="p-4 flex items-center justify-between bg-white border-b border-slate-100">
+                        <div className="flex items-center gap-3 cursor-pointer select-none flex-1" onClick={() => setExpandedNotes({...expandedNotes, [note.id]: !isExpanded})}>
+                          {isExpanded ? <ChevronDown size={16} className="text-[#cb11ab]" /> : <ChevronRight size={16} className="text-slate-400" />}
+                          <input type="checkbox" checked={note.completed} onClick={(e) => e.stopPropagation()} onChange={() => setNotesList(notesList.map(n => n.id === note.id ? {...n, completed: !n.completed} : n))} className="w-4 h-4 accent-[#cb11ab] rounded cursor-pointer" />
+                          <span className={`font-bold text-sm ${note.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>{note.title}</span>
+                          <span className="text-xs font-mono bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-slate-500">📅 {note.date}</span>
+                        </div>
+                        <button onClick={() => setNotesList(notesList.filter(n => n.id !== note.id))} className="text-slate-400 hover:text-rose-600 p-1"><Trash2 size={15} /></button>
                       </div>
-                      <button onClick={() => setNotesList(notesList.filter(n => n.id !== note.id))} className="text-slate-400 hover:text-rose-600 p-1"><Trash2 size={15} /></button>
-                    </div>
 
-                    {/* Панель инструментов редактора */}
-                    <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg p-1 w-fit">
-                      <button type="button" onClick={() => applyExecCommand('bold')} title="Жирный" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Bold size={13} /></button>
-                      <button type="button" onClick={() => applyExecCommand('italic')} title="Курсив" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Italic size={13} /></button>
-                      <span className="w-px h-4 bg-slate-200 mx-1"></span>
-                      <button type="button" onClick={() => applyExecCommand('formatBlock', '<h1>')} title="Заголовок 1" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Heading1 size={13} /></button>
-                      <button type="button" onClick={() => applyExecCommand('formatBlock', '<h2>')} title="Заголовок 2" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Heading2 size={13} /></button>
-                      <span className="w-px h-4 bg-slate-200 mx-1"></span>
-                      <button type="button" onClick={() => applyExecCommand('insertUnorderedList')} title="Маркированный список" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><List size={13} /></button>
-                      <button type="button" onClick={() => applyExecCommand('insertOrderedList')} title="Нумерованный список" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><ListOrdered size={13} /></button>
-                      <button type="button" onClick={() => applyExecCommand('formatBlock', '<blockquote>')} title="Цитата" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Quote size={13} /></button>
+                      {isExpanded && (
+                        <div className="p-4 space-y-3 bg-white">
+                          <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg p-1 w-fit">
+                            <button type="button" onClick={() => applyExecCommand('bold')} title="Жирный" className="p-1.5 hover:bg-slate-200 rounded text-slate-700"><Bold size={13} /></button>
+                            <button type="button" onClick={() => applyExecCommand('italic')} title="Курсив" className="p-1.5 hover:bg-slate-200 rounded text-slate-700"><Italic size={13} /></button>
+                            <span className="w-px h-4 bg-slate-200 mx-1"></span>
+                            <button type="button" onClick={() => applyExecCommand('insertUnorderedList')} title="Список" className="p-1.5 hover:bg-slate-200 rounded text-slate-700"><List size={13} /></button>
+                            <button type="button" onClick={() => applyExecCommand('insertOrderedList')} title="Нумерованный список" className="p-1.5 hover:bg-slate-200 rounded text-slate-700"><ListOrdered size={13} /></button>
+                          </div>
+                          <div 
+                            contentEditable
+                            suppressContentEditableWarning={true}
+                            onBlur={(e) => {
+                              const html = e.currentTarget.innerHTML;
+                              setNotesList(notesList.map(n => n.id === note.id ? {...n, htmlContent: html} : n));
+                            }}
+                            dangerouslySetInnerHTML={{ __html: note.htmlContent }}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-800 font-sans focus:outline-none focus:border-[#cb11ab] min-h-[120px] max-h-[300px] overflow-y-auto leading-relaxed"
+                          />
+                        </div>
+                      )}
                     </div>
-
-                    {/* Поле редактирования с поддержкой списков и стилей (contentEditable) */}
-                    <div 
-                      contentEditable
-                      suppressContentEditableWarning={true}
-                      onBlur={(e) => {
-                        const html = e.currentTarget.innerHTML;
-                        setNotesList(notesList.map(n => n.id === note.id ? {...n, htmlContent: html} : n));
-                      }}
-                      dangerouslySetInnerHTML={{ __html: note.htmlContent }}
-                      className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs text-slate-800 font-sans focus:outline-none focus:border-[#cb11ab] min-h-[120px] max-h-[300px] overflow-y-auto leading-relaxed"
-                    />
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -770,7 +758,23 @@ export default function App() {
                 ))}
                 {isTyping && (<div className="flex items-center gap-3"><div className="w-8 h-8 rounded-xl bg-slate-100 text-[#cb11ab] border flex items-center justify-center"><Bot size={16} /></div><div className="p-4 bg-slate-50 border rounded-2xl text-slate-500 text-xs flex items-center gap-2"><Loader2 size={14} className="animate-spin text-[#cb11ab]" /> ИИ думает...</div></div>)}
               </div>
-              <form onSubmit={handleSendMessage} className="pt-4 border-t border-slate-200 flex gap-3 shrink-0">
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                if (!inputMessage.trim()) return;
+                const txt = inputMessage;
+                setChatMessages(prev => [...prev, { role: 'user', content: txt }]);
+                setInputMessage('');
+                setIsTyping(true);
+                setTimeout(() => {
+                  let reply = `🤖 Интеллектуальный поиск: обработал запрос по ${tasks.length} задачам.`;
+                  if (txt.toLowerCase().includes('просроч')) {
+                    const overdue = tasks.filter(t => t.status !== 'Выполнено' && t.deadline && t.deadline < '2026-08-06');
+                    reply = `⚠️ Найдено просроченных задач: ${overdue.length}\n` + overdue.map(t => `• [${t.project}] ${t.name} (дедлайн: ${t.deadline})`).join('\n');
+                  }
+                  setChatMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+                  setIsTyping(false);
+                }, 400);
+              }} className="pt-4 border-t border-slate-200 flex gap-3 shrink-0">
                 <input type="text" value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} placeholder="Спросите 'Найди просрочки'..." className="flex-1 bg-slate-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#cb11ab]" />
                 <button type="submit" className="bg-[#cb11ab] text-white px-5 py-3 rounded-xl font-medium shadow-md"><Send size={18} /></button>
               </form>
@@ -809,7 +813,15 @@ export default function App() {
                       ))
                     )}
                   </div>
-                  <form onSubmit={handleAddComment} className="flex gap-2 pt-3 border-t shrink-0">
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!newCommentText.trim() || !selectedTaskForModal) return;
+                    const newComment = { author: 'Фроленков Денис', text: newCommentText.trim(), time: new Date().toLocaleString() };
+                    const updatedTasks = tasks.map(t => t.id === selectedTaskForModal.id ? { ...t, comments: [...(t.comments || []), newComment] } : t);
+                    setTasks(updatedTasks);
+                    setSelectedTaskForModal(prev => ({ ...prev, comments: [...(prev.comments || []), newComment] }));
+                    setNewCommentText('');
+                  }} className="flex gap-2 pt-3 border-t shrink-0">
                     <input type="text" value={newCommentText} onChange={(e) => setNewCommentText(e.target.value)} placeholder="Написать сообщение..." className="flex-1 bg-slate-50 border rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#cb11ab]" />
                     <button type="submit" className="bg-[#cb11ab] text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1"><Send size={14} /> Отправить</button>
                   </form>
