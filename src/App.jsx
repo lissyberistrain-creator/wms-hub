@@ -13,12 +13,14 @@ import {
   RefreshCw,
   User,
   Kanban,
-  Settings
+  Settings,
+  Calendar
 } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('kanban');
   const [selectedProject, setSelectedProject] = useState('all');
+  const [ganttScale, setGanttScale] = useState('months'); // 'days' | 'weeks' | 'months' | 'years'
 
   const [roleDevelopers, setRoleDevelopers] = useState(() => {
     const saved = localStorage.getItem('wms_hub_roles_v1');
@@ -62,7 +64,7 @@ export default function App() {
     { id: 20, project: "Саппорт", name: "Признак \"Супер сейф\"", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01" },
     { id: 21, project: "Саппорт", name: "Создание заданий на инвент КБТ по заявкам", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01" },
     { id: 22, project: "Саппорт", name: "Ограничение для формирования авто задач в модуле снятие по предметам", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01" },
-    { id: 23, project: "Инвентаризация", name: "Сквозной идентификатор заданий на инвент", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 10, planStart: "2025-11-01", planEnd: "2025-12-15", factEnd: "" }], resultsHistory: [], deadline: "2026-09-15", startDate: "2025-11-01" },
+    { id: 23, project: "Инвентаризация", name: "Сквозной идентификатор заданий на инвент", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 10, planStart: "2026-08-01", planEnd: "2026-09-15", factEnd: "" }], resultsHistory: [], deadline: "2026-09-15", startDate: "2026-08-01" },
     { id: 24, project: "Инвентаризация", name: "Объединение процессов Инвентаризации", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01" },
     { id: 25, project: "Снятие", name: "Указывать тип подбора после скана баркода", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01" },
     { id: 26, project: "Инвентаризация", name: "Отдельный параметр сдачи заданий на инвент", status: "Бэклог", priority: "Низкий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "", planEnd: "", factEnd: "" }], resultsHistory: [], deadline: "2026-11-30", startDate: "2026-06-01" },
@@ -93,7 +95,7 @@ export default function App() {
   ];
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_light_v25');
+    const saved = localStorage.getItem('wms_hub_light_v26');
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
@@ -125,7 +127,7 @@ export default function App() {
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('wms_hub_light_v25', JSON.stringify(tasks));
+    localStorage.setItem('wms_hub_light_v26', JSON.stringify(tasks));
   }, [tasks]);
 
   useEffect(() => {
@@ -134,7 +136,7 @@ export default function App() {
 
   const handleResetToExcel = () => {
     setTasks(initial50Tasks);
-    localStorage.setItem('wms_hub_light_v25', JSON.stringify(initial50Tasks));
+    localStorage.setItem('wms_hub_light_v26', JSON.stringify(initial50Tasks));
   };
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
@@ -381,12 +383,22 @@ export default function App() {
     }
   });
 
-  // Расчет динамической шкалы Ганта с диапазоном от 2025-07-01 по 2026-12-31
-  const getGanttBarStyles = (startStr, endStr) => {
-    const timelineStart = new Date('2025-07-01').getTime();
-    const timelineEnd = new Date('2026-12-31').getTime();
-    const totalDuration = timelineEnd - timelineStart;
+  // Расчет полос Ганта под выбранный масштаб
+  const getGanttBarStyles = (startStr, endStr, scale) => {
+    let timelineStart, timelineEnd;
+    if (scale === 'years') {
+      timelineStart = new Date('2024-01-01').getTime();
+      timelineEnd = new Date('2027-12-31').getTime();
+    } else if (scale === 'months' || scale === 'weeks') {
+      timelineStart = new Date('2025-07-01').getTime();
+      timelineEnd = new Date('2026-12-31').getTime();
+    } else {
+      // days (берем текущий месяц августа 2026 для примера детального отображения по дням)
+      timelineStart = new Date('2026-08-01').getTime();
+      timelineEnd = new Date('2026-08-31').getTime();
+    }
 
+    const totalDuration = timelineEnd - timelineStart;
     const sDate = new Date(startStr || '2025-09-01').getTime();
     const eDate = new Date(endStr || '2026-12-31').getTime();
 
@@ -633,44 +645,114 @@ export default function App() {
             </div>
           )}
 
-          {/* НАСТОЯЩИЙ ГАНТ С ЯВНЫМ РАЗГРАНИЧЕНИЕМ ПО ГОДАМ И ФИКСИРОВАННОЙ ШАПКОЙ */}
+          {/* НАСТОЯЩИЙ ГАНТ С ВЫБОРОМ МАСШТАБА (КАК В YOUGILE) И ФИКСИРОВАННОЙ ШАПКОЙ */}
           {activeTab === 'gantt' && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
               <div className="flex justify-between items-center border-b border-slate-200 pb-4">
-                <h3 className="text-lg font-bold text-slate-800">📊 ГАНТ ПО ЗАДАЧАМ (2025 - 2026)</h3>
-                <div className="flex items-center gap-4 text-xs text-slate-600 font-medium">
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-emerald-500"></span> Выполнено</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-[#cb11ab]"></span> В работе</span>
+                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <Calendar className="text-[#cb11ab]" /> Диаграмма Ганта
+                </h3>
+                
+                {/* Селектор масштаба (Дни / Недели / Месяцы / Годы) как на вашем скрине */}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-medium text-slate-500">Масштаб:</span>
+                  <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200 text-xs">
+                    <button 
+                      onClick={() => setGanttScale('days')} 
+                      className={`px-3 py-1.5 rounded-lg font-medium transition-all ${ganttScale === 'days' ? 'bg-white text-[#cb11ab] shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                      Дни
+                    </button>
+                    <button 
+                      onClick={() => setGanttScale('weeks')} 
+                      className={`px-3 py-1.5 rounded-lg font-medium transition-all ${ganttScale === 'weeks' ? 'bg-white text-[#cb11ab] shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                      Недели
+                    </button>
+                    <button 
+                      onClick={() => setGanttScale('months')} 
+                      className={`px-3 py-1.5 rounded-lg font-medium transition-all ${ganttScale === 'months' ? 'bg-white text-[#cb11ab] shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                      Месяцы
+                    </button>
+                    <button 
+                      onClick={() => setGanttScale('years')} 
+                      className={`px-3 py-1.5 rounded-lg font-medium transition-all ${ganttScale === 'years' ? 'bg-white text-[#cb11ab] shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                      Годы
+                    </button>
+                  </div>
                 </div>
               </div>
 
               {/* Обертка с вертикальным и горизонтальным скроллом */}
               <div className="overflow-auto max-h-[650px] border border-slate-200 rounded-xl relative shadow-sm">
-                <div className="min-w-[2000px]">
-                  {/* Зафиксированная шапка сверху с разделением на 2025 и 2026 годы */}
+                <div className={ganttScale === 'days' ? 'min-w-[2800px]' : ganttScale === 'weeks' ? 'min-w-[2200px]' : 'min-w-[1800px]'}>
+                  
+                  {/* Зафиксированная шапка сверху */}
                   <div className="sticky top-0 z-40 bg-slate-100 border-b border-slate-300 shadow-sm">
-                    {/* Строка годов с явной линией разделения */}
-                    <div className="grid grid-cols-12 text-xs font-bold text-slate-800 text-center py-1.5 border-b border-slate-200">
-                      <div className="w-80 text-left pl-4 sticky left-0 bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Проект & Задача</div>
+                    {/* Строка с годами / периодами */}
+                    <div className="grid grid-cols-12 text-xs font-bold text-slate-800 text-center py-2 border-b border-slate-200">
+                      <div className="w-80 text-left pl-4 sticky left-0 bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Название задачи</div>
                       <div className="w-32 sticky left-80 bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Статус</div>
+                      <div className="w-32 sticky left-[448px] bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Диапазон дат</div>
                       
-                      <div className="col-span-8 grid grid-cols-18 text-xs font-bold">
-                        <div className="col-span-6 border-r-2 border-[#cb11ab] bg-[#cb11ab]/10 text-[#cb11ab] py-1">📅 2025 ГОД (Июль — Декабрь)</div>
-                        <div className="col-span-12 bg-emerald-50 text-emerald-800 py-1">📅 2026 ГОД (Январь — Декабрь)</div>
+                      <div className="col-span-8 flex items-center justify-around font-bold text-xs px-4">
+                        {ganttScale === 'years' && (
+                          <div className="w-full flex justify-around text-[#cb11ab]">
+                            <span>📅 2024 ГОД</span>
+                            <span className="border-l-2 border-[#cb11ab] pl-4">📅 2025 ГОД</span>
+                            <span className="border-l-2 border-[#cb11ab] pl-4">📅 2026 ГОД</span>
+                            <span className="border-l-2 border-[#cb11ab] pl-4">📅 2027 ГОД</span>
+                          </div>
+                        )}
+                        {ganttScale === 'months' && (
+                          <div className="w-full flex justify-around">
+                            <span className="text-[#cb11ab]">2025 (Второе полугодие)</span>
+                            <span className="border-l-2 border-[#cb11ab] pl-4 text-emerald-800">2026 (Весь год)</span>
+                          </div>
+                        )}
+                        {ganttScale === 'weeks' && (
+                          <div className="w-full text-slate-600">Недельное расписание проектов (2025 - 2026)</div>
+                        )}
+                        {ganttScale === 'days' && (
+                          <div className="w-full text-slate-600">Детализация по дням — Август 2026</div>
+                        )}
                       </div>
                     </div>
 
-                    {/* Строка месяцев */}
+                    {/* Строка подписей колонок шкалы */}
                     <div className="grid grid-cols-12 text-[10px] font-bold text-slate-600 text-center py-2 items-center">
                       <div className="w-80 text-left pl-4 sticky left-0 bg-slate-100 z-50"></div>
                       <div className="w-32 sticky left-80 bg-slate-100 z-50"></div>
+                      <div className="w-32 sticky left-[448px] bg-slate-100 z-50"></div>
                       
-                      <div className="col-span-8 grid grid-cols-18 font-mono">
-                        {/* 2025 */}
-                        <span>Июл</span><span>Авг</span><span>Сен</span><span>Окт</span><span>Ноя</span><span className="border-r-2 border-[#cb11ab]">Дек</span>
-                        {/* 2026 */}
-                        <span>Янв</span><span>Фев</span><span>Мар</span><span>Апр</span><span>Май</span><span>Июн</span>
-                        <span>Июл</span><span>Авг</span><span>Сен</span><span>Окт</span><span>Ноя</span><span>Дек</span>
+                      <div className="col-span-8 grid grid-cols-12 font-mono text-[10px]">
+                        {ganttScale === 'months' && (
+                          <>
+                            <span>Июл 25</span><span>Авг</span><span>Сен</span><span>Окт</span><span>Ноя</span><span className="border-r-2 border-[#cb11ab]">Дек</span>
+                            <span>Янв 26</span><span>Фев</span><span>Мар</span><span>Апр</span><span>Май</span><span>Июн</span>
+                            <span>Июл</span><span>Авг</span><span>Сен</span><span>Окт</span><span>Ноя</span><span>Дек</span>
+                          </>
+                        )}
+                        {ganttScale === 'years' && (
+                          <>
+                            <span className="border-r border-slate-300">2024</span>
+                            <span className="border-r border-slate-300">Q1-Q2 '25</span>
+                            <span className="border-r-2 border-[#cb11ab]">Q3-Q4 '25</span>
+                            <span className="border-r border-slate-300">Q1 '26</span>
+                            <span className="border-r border-slate-300">Q2 '26</span>
+                            <span className="border-r border-slate-300">Q3 '26</span>
+                            <span className="border-r border-slate-300">Q4 '26</span>
+                            <span>2027</span>
+                          </>
+                        )}
+                        {ganttScale === 'weeks' && (
+                          <div className="col-span-12 flex justify-between px-2 text-slate-500">
+                            <span>Неделя 1</span><span>Неделя 2</span><span>Неделя 3</span><span>Неделя 4</span><span>Неделя 5</span><span>Неделя 6</span>
+                          </div>
+                        )}
+                        {ganttScale === 'days' && (
+                          <div className="col-span-12 flex justify-between px-1 text-slate-500">
+                            {[...Array(31)].map((_, i) => (<span key={i}>{i+1}</span>))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -680,10 +762,11 @@ export default function App() {
                     {filteredTasks.map(t => {
                       const isDone = t.status === 'Выполнено';
                       const isInProgress = t.status === 'В работе' || t.status === 'Тестирование';
-                      const barStyle = getGanttBarStyles(t.startDate || '2025-09-01', t.deadline || '2026-12-31');
+                      const barStyle = getGanttBarStyles(t.startDate || '2025-09-01', t.deadline || '2026-12-31', ganttScale);
 
                       return (
                         <div key={t.id} className="grid grid-cols-12 items-center text-xs py-2.5 px-2 hover:bg-slate-50 transition-colors">
+                          {/* Фиксированные левые колонки как в YouGile */}
                           <div className="w-80 pr-2 pl-2 sticky left-0 bg-white z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                             <span className="text-[10px] font-bold text-[#cb11ab] block">[{t.project}]</span>
                             <span className="font-semibold text-slate-800 truncate block" title={t.name}>{t.name}</span>
@@ -695,16 +778,17 @@ export default function App() {
                             }`}>{t.status}</span>
                           </div>
 
-                          {/* Динамическая шкала Ганта с линией разграничения 2025/2026 */}
-                          <div className="col-span-8 relative bg-slate-50 h-7 rounded-lg flex items-center px-1 border border-slate-200 ml-4 overflow-hidden">
-                            {/* Вертикальная линия разделения годов на фоне */}
-                            <div className="absolute top-0 bottom-0 left-[33.33%] w-[2px] bg-[#cb11ab]/30 z-0"></div>
+                          <div className="w-32 sticky left-[448px] bg-white z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] text-[11px] font-mono text-slate-600">
+                            {t.startDate ? `${t.startDate}` : '—'}
+                          </div>
 
+                          {/* Шкала Ганта справа */}
+                          <div className="col-span-8 relative bg-slate-50 h-7 rounded-lg flex items-center px-1 border border-slate-200 ml-4 overflow-hidden">
                             <div className={`absolute h-4 rounded-md shadow-sm z-10 transition-all ${
                               isDone ? 'bg-emerald-500' : isInProgress ? 'bg-[#cb11ab]' : 'bg-amber-400'
                             }`} style={barStyle}></div>
                             <span className="relative z-20 text-[10px] font-mono text-slate-700 pl-2 font-bold bg-white/80 px-1 rounded">
-                              {t.startDate ? `${t.startDate} → ` : ''}{t.deadline}
+                              Дедлайн: {t.deadline}
                             </span>
                           </div>
                         </div>
