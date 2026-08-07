@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   LayoutDashboard, 
   FolderKanban, 
@@ -26,8 +26,7 @@ import {
   ListOrdered,
   Heading1,
   Heading2,
-  Quote,
-  Table as TableIcon
+  Quote
 } from 'lucide-react';
 
 export default function App() {
@@ -55,20 +54,19 @@ export default function App() {
   const [newLinkModal, setNewLinkModal] = useState(false);
   const [linkForm, setLinkForm] = useState({ name: '', url: '', description: '' });
 
-  // Вкладка "Заметки и задачник" с датами и панелью форматирования
+  // Вкладка "Заметки и задачник"
   const [notesList, setNotesList] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_notes_v2');
+    const saved = localStorage.getItem('wms_hub_notes_v3');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { /* ignore */ }
     }
     return [
-      { id: 1, title: 'Встреча с Егором', date: '2026-05-28', completed: true, text: '1) Арина (проверка сдачи хп инвентаризации) - завести карточки\n2) Подключение складов к авто заданиям (Новосиб, Казахстан)\n3) Отчет общие показатели' },
-      { id: 2, title: 'Контроль выполнения задач инвентаризации', date: '2026-08-06', completed: false, text: 'Проверить раскатку снятия вещей после рефакторинга ТСД.' },
-      { id: 3, title: 'Вопросы по мобильному приложению', date: '2026-08-07', completed: false, text: 'Узнать у мобилки про поиск по заданию и термейнит листа инвент.' }
+      { id: 1, title: 'Встреча с Егором', date: '2026-05-28', completed: true, htmlContent: '<div>1) Арина (проверка сдачи хп инвентаризации) - завести карточки</div><div>2) Подключение складов к авто заданиям</div><div>3) Отчет общие показатели</div>' },
+      { id: 2, title: 'Контроль выполнения задач', date: '2026-08-07', completed: false, htmlContent: '<div>Проверить раскатку снятия вещей после рефакторинга ТСД.</div>' }
     ];
   });
   const [newNoteTitle, setNewNoteTitle] = useState('');
-  const [newNoteDate, setNewNoteDate] = useState('2026-08-07');
+  const [newNoteDate, setNewNoteDate] = useState(new Date().toISOString().split('T')[0]);
 
   const [roleDevelopers, setRoleDevelopers] = useState(() => {
     const saved = localStorage.getItem('wms_hub_roles_v1');
@@ -102,7 +100,7 @@ export default function App() {
   ];
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_light_v28');
+    const saved = localStorage.getItem('wms_hub_light_v29');
     if (saved) {
       try { const parsed = JSON.parse(saved); if (parsed && Array.isArray(parsed)) return parsed; } catch (e) { /* ignore */ }
     }
@@ -131,14 +129,14 @@ export default function App() {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  useEffect(() => { localStorage.setItem('wms_hub_light_v28', JSON.stringify(tasks)); }, [tasks]);
+  useEffect(() => { localStorage.setItem('wms_hub_light_v29', JSON.stringify(tasks)); }, [tasks]);
   useEffect(() => { localStorage.setItem('wms_hub_roles_v1', JSON.stringify(roleDevelopers)); }, [roleDevelopers]);
   useEffect(() => { localStorage.setItem('wms_hub_links_v1', JSON.stringify(workLinks)); }, [workLinks]);
-  useEffect(() => { localStorage.setItem('wms_hub_notes_v2', JSON.stringify(notesList)); }, [notesList]);
+  useEffect(() => { localStorage.setItem('wms_hub_notes_v3', JSON.stringify(notesList)); }, [notesList]);
 
   const handleResetToExcel = () => {
     setTasks(initial50Tasks);
-    localStorage.setItem('wms_hub_light_v28', JSON.stringify(initial50Tasks));
+    localStorage.setItem('wms_hub_light_v29', JSON.stringify(initial50Tasks));
   };
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
@@ -272,14 +270,9 @@ export default function App() {
     return '5 дн.';
   };
 
-  // Вспомогательная функция для вставки тегов форматирования в текст заметки
-  const insertFormatting = (noteId, tagStart, tagEnd = '') => {
-    setNotesList(notesList.map(n => {
-      if (n.id === noteId) {
-        return { ...n, text: n.text + `${tagStart}${tagEnd}` };
-      }
-      return n;
-    }));
+  // Команды для форматирования в редакторе заметки через execCommand
+  const applyExecCommand = (command, value = null) => {
+    document.execCommand(command, false, value);
   };
 
   const getGanttBarStyles = (startStr, endStr, scale) => {
@@ -511,7 +504,7 @@ export default function App() {
             </div>
           )}
 
-          {/* ГАНТ С ПОЛЕМ ДНЕЙ И ЧАТОВЫМИ МОДАЛКАМИ */}
+          {/* ГАНТ */}
           {activeTab === 'gantt' && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
               <div className="flex justify-between items-center border-b border-slate-200 pb-4">
@@ -631,39 +624,41 @@ export default function App() {
             </div>
           )}
 
-          {/* ЗАМЕТКИ И ЗАДАЧНИК (С ВЫБОРОМ ДАТЫ И РЕДАКТОРОМ) */}
+          {/* ЗАМЕТКИ И ЗАДАЧНИК (С ПОЛНОЦЕННЫМ ВИЗУАЛЬНЫМ РЕДАКТОРОМ И ВЫБОРОМ ДАТЫ) */}
           {activeTab === 'notes' && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 max-w-5xl">
               <div className="flex justify-between items-center border-b border-slate-200 pb-4">
                 <div>
                   <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2"><FileText className="text-[#cb11ab]" /> Общие заметки и задачник</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Ведите протоколы встреч, списки дел по дням и продуктовые заметки</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Ведите протоколы встреч, списки дел и продуктовые заметки с форматированием</p>
                 </div>
               </div>
 
-              <div className="flex gap-2 items-center">
+              {/* Создание новой заметки */}
+              <div className="flex gap-3 items-center bg-slate-50 p-4 rounded-2xl border border-slate-200">
                 <input 
                   type="date" 
                   value={newNoteDate} 
                   onChange={(e) => setNewNoteDate(e.target.value)} 
-                  className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono text-slate-800"
+                  className="bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono text-slate-800"
                 />
                 <input 
                   type="text" 
                   value={newNoteTitle} 
                   onChange={(e) => setNewNoteTitle(e.target.value)} 
                   placeholder="Заголовок задачи или встречи..." 
-                  className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#cb11ab]"
+                  className="flex-1 bg-white border border-slate-300 rounded-xl px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#cb11ab]"
                 />
                 <button onClick={() => {
                   if (!newNoteTitle.trim()) return;
-                  setNotesList([{ id: Date.now(), title: newNoteTitle.trim(), date: newNoteDate, completed: false, text: '' }, ...notesList]);
+                  setNotesList([{ id: Date.now(), title: newNoteTitle.trim(), date: newNoteDate, completed: false, htmlContent: '<div>Введите текст заметки...</div>' }, ...notesList]);
                   setNewNoteTitle('');
                 }} className="bg-[#cb11ab] hover:bg-[#b00f95] text-white px-5 py-2 rounded-xl text-sm font-semibold shadow-md flex items-center gap-1.5">
                   <Plus size={16} /> Создать
                 </button>
               </div>
 
+              {/* Список заметок с панелью форматирования */}
               <div className="space-y-4">
                 {notesList.map(note => (
                   <div key={note.id} className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-3 shadow-sm">
@@ -671,32 +666,45 @@ export default function App() {
                       <div className="flex items-center gap-3">
                         <input type="checkbox" checked={note.completed} onChange={() => setNotesList(notesList.map(n => n.id === note.id ? {...n, completed: !n.completed} : n))} className="w-4 h-4 accent-[#cb11ab] rounded cursor-pointer" />
                         <span className={`font-bold text-sm ${note.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>{note.title}</span>
-                        <span className="text-xs font-mono bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-500">📅 {note.date}</span>
+                        <span className="text-xs font-mono bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-500 flex items-center gap-1">
+                          <Calendar size={12} className="text-[#cb11ab]" /> 
+                          <input 
+                            type="date" 
+                            value={note.date} 
+                            onChange={(e) => {
+                              const newD = e.target.value;
+                              setNotesList(notesList.map(n => n.id === note.id ? {...n, date: newD} : n));
+                            }}
+                            className="bg-transparent border-none text-xs font-mono text-slate-600 focus:outline-none cursor-pointer"
+                          />
+                        </span>
                       </div>
                       <button onClick={() => setNotesList(notesList.filter(n => n.id !== note.id))} className="text-slate-400 hover:text-rose-600 p-1"><Trash2 size={15} /></button>
                     </div>
 
-                    {/* Панель форматирования текста (Жирный, Курсор, Списки) */}
+                    {/* Панель инструментов редактора */}
                     <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg p-1 w-fit">
-                      <button onClick={() => insertFormatting(note.id, '**', '**')} title="Жирный" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Bold size={13} /></button>
-                      <button onClick={() => insertFormatting(note.id, '*', '*')} title="Курсив" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Italic size={13} /></button>
+                      <button type="button" onClick={() => applyExecCommand('bold')} title="Жирный" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Bold size={13} /></button>
+                      <button type="button" onClick={() => applyExecCommand('italic')} title="Курсив" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Italic size={13} /></button>
                       <span className="w-px h-4 bg-slate-200 mx-1"></span>
-                      <button onClick={() => insertFormatting(note.id, '# ')} title="Заголовок 1" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Heading1 size={13} /></button>
-                      <button onClick={() => insertFormatting(note.id, '## ')} title="Заголовок 2" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Heading2 size={13} /></button>
+                      <button type="button" onClick={() => applyExecCommand('formatBlock', '<h1>')} title="Заголовок 1" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Heading1 size={13} /></button>
+                      <button type="button" onClick={() => applyExecCommand('formatBlock', '<h2>')} title="Заголовок 2" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Heading2 size={13} /></button>
                       <span className="w-px h-4 bg-slate-200 mx-1"></span>
-                      <button onClick={() => insertFormatting(note.id, '\n- ')} title="Маркированный список" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><List size={13} /></button>
-                      <button onClick={() => insertFormatting(note.id, '\n1. ')} title="Нумерованный список" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><ListOrdered size={13} /></button>
-                      <button onClick={() => insertFormatting(note.id, '\n> ')} title="Цитата" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Quote size={13} /></button>
+                      <button type="button" onClick={() => applyExecCommand('insertUnorderedList')} title="Маркированный список" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><List size={13} /></button>
+                      <button type="button" onClick={() => applyExecCommand('insertOrderedList')} title="Нумерованный список" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><ListOrdered size={13} /></button>
+                      <button type="button" onClick={() => applyExecCommand('formatBlock', '<blockquote>')} title="Цитата" className="p-1.5 hover:bg-slate-100 rounded text-slate-700"><Quote size={13} /></button>
                     </div>
 
-                    <textarea 
-                      value={note.text}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setNotesList(notesList.map(n => n.id === note.id ? {...n, text: val} : n));
+                    {/* Поле редактирования с поддержкой списков и стилей (contentEditable) */}
+                    <div 
+                      contentEditable
+                      suppressContentEditableWarning={true}
+                      onBlur={(e) => {
+                        const html = e.currentTarget.innerHTML;
+                        setNotesList(notesList.map(n => n.id === note.id ? {...n, htmlContent: html} : n));
                       }}
-                      placeholder="Введите текст заметки или протокола..."
-                      className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs text-slate-700 font-mono focus:outline-none focus:border-[#cb11ab] h-28"
+                      dangerouslySetInnerHTML={{ __html: note.htmlContent }}
+                      className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs text-slate-800 font-sans focus:outline-none focus:border-[#cb11ab] min-h-[120px] max-h-[300px] overflow-y-auto leading-relaxed"
                     />
                   </div>
                 ))}
@@ -771,7 +779,7 @@ export default function App() {
         </div>
       </main>
 
-      {/* МОДАЛЬНОЕ ОКНО ЗАДАЧИ (С ЧАТОМ КАК В YOUGILE) */}
+      {/* МОДАЛЬНОЕ ОКНО ЗАДАЧИ */}
       {selectedTaskForModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-3xl p-6 shadow-2xl space-y-6 flex flex-col h-[650px]">
