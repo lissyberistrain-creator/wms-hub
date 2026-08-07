@@ -10,15 +10,11 @@ export default function App() {
   const [selectedProject, setSelectedProject] = useState('all');
   const [ganttScale, setGanttScale] = useState('months');
 
-  // Модальное окно деталей задачи
   const [selectedTaskForModal, setSelectedTaskForModal] = useState(null);
   const [taskModalTab, setTaskModalTab] = useState('chat');
   const [newCommentText, setNewCommentText] = useState('');
-
-  // Состояние свернутых заметок (по умолчанию свернуты)
   const [expandedNotes, setExpandedNotes] = useState({});
 
-  // Полная база из 50 задач
   const full50Tasks = [
     { id: 1, project: "WMS MOBILE", name: "Снятие Рефакторинг", status: "Тестирование", priority: "Высокий", dependsOn: null, roles: [{ role: "Mobile", dev: "Сухоруков Роман", estimateDays: 10, planStart: "2026-04-01", planEnd: "2026-05-05", factEnd: "" }], resultsHistory: ["Успешный прогон автотестов рефакторинга"], deadline: "2026-08-10", startDate: "2026-04-01", comments: [{ author: "Фроленков Денис", text: "Ждем результаты тестирования на складе", time: "05.08.2026 12:40" }], description: "Рефакторинг модуля снятия с ТСД для ускорения отклика." },
     { id: 2, project: "Поиск", name: "Модуль поиска списанных вещей", status: "В работе", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 10, planStart: "2026-07-31", planEnd: "2026-08-03", factEnd: "" }], resultsHistory: [], deadline: "2026-08-10", startDate: "2026-07-31", comments: [], description: "Разработка таблиц БД и API поиска списанных позиций." },
@@ -73,7 +69,7 @@ export default function App() {
   ];
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_light_v31');
+    const saved = localStorage.getItem('wms_hub_light_v32');
     if (saved) {
       try { const parsed = JSON.parse(saved); if (parsed && Array.isArray(parsed) && parsed.length > 0) return parsed; } catch (e) { /* ignore */ }
     }
@@ -96,7 +92,6 @@ export default function App() {
     description: ''
   });
 
-  // Вкладка "Ссылки для работы"
   const [workLinks, setWorkLinks] = useState(() => {
     const saved = localStorage.getItem('wms_hub_links_v1');
     return saved ? JSON.parse(saved) : [
@@ -107,9 +102,8 @@ export default function App() {
   const [newLinkModal, setNewLinkModal] = useState(false);
   const [linkForm, setLinkForm] = useState({ name: '', url: '', description: '' });
 
-  // Вкладка "Заметки и задачник" (сворачиваемые по умолчанию)
   const [notesList, setNotesList] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_notes_v5');
+    const saved = localStorage.getItem('wms_hub_notes_v6');
     return saved ? JSON.parse(saved) : [
       { id: 1, title: 'Встреча с Егором', date: '2026-05-28', completed: true, htmlContent: '<ol><li>Арина (проверка сдачи хп инвентаризации) - завести карточки</li><li>Подключение складов к авто заданиям</li><li>Отчет общие показатели</li></ol>' },
       { id: 2, title: 'Контроль выполнения задач', date: '2026-08-07', completed: false, htmlContent: '<div>Проверить раскатку снятия вещей после рефакторинга ТСД.</div>' }
@@ -140,14 +134,14 @@ export default function App() {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  useEffect(() => { localStorage.setItem('wms_hub_light_v31', JSON.stringify(tasks)); }, [tasks]);
+  useEffect(() => { localStorage.setItem('wms_hub_light_v32', JSON.stringify(tasks)); }, [tasks]);
   useEffect(() => { localStorage.setItem('wms_hub_roles_v1', JSON.stringify(roleDevelopers)); }, [roleDevelopers]);
   useEffect(() => { localStorage.setItem('wms_hub_links_v1', JSON.stringify(workLinks)); }, [workLinks]);
-  useEffect(() => { localStorage.setItem('wms_hub_notes_v5', JSON.stringify(notesList)); }, [notesList]);
+  useEffect(() => { localStorage.setItem('wms_hub_notes_v6', JSON.stringify(notesList)); }, [notesList]);
 
   const handleResetToExcel = () => {
     setTasks(full50Tasks);
-    localStorage.setItem('wms_hub_light_v31', JSON.stringify(full50Tasks));
+    localStorage.setItem('wms_hub_light_v32', JSON.stringify(full50Tasks));
   };
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
@@ -234,10 +228,6 @@ export default function App() {
     setTasks(tasks.filter(t => t.id !== id));
   };
 
-  const handleStatusChange = (taskId, newStatus) => {
-    setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
-  };
-
   const handleDragStart = (e, taskId) => { e.dataTransfer.setData('text/plain', taskId); };
   const handleDragOver = (e) => { e.preventDefault(); };
   const handleDrop = (e, targetStatus) => {
@@ -258,6 +248,7 @@ export default function App() {
     document.execCommand(command, false, value);
   };
 
+  // Исправленный расчет шкалы Ганта без наслоения
   const getGanttBarStyles = (startStr, endStr, scale) => {
     let timelineStart, timelineEnd;
     if (scale === 'years') {
@@ -278,7 +269,7 @@ export default function App() {
     const clampedStart = Math.max(timelineStart, Math.min(timelineEnd, sDate));
     const clampedEnd = Math.max(timelineStart, Math.min(timelineEnd, eDate));
 
-    const leftPercent = Math.max(0, Math.min(95, ((clampedStart - timelineStart) / totalDuration) * 100));
+    const leftPercent = Math.max(0, Math.min(92, ((clampedStart - timelineStart) / totalDuration) * 100));
     const widthPercent = Math.max(3, Math.min(100 - leftPercent, ((clampedEnd - clampedStart) / totalDuration) * 100));
 
     return { left: `${leftPercent}%`, width: `${widthPercent}%` };
@@ -293,6 +284,32 @@ export default function App() {
     { title: '🚫 Отмена', status: 'Отмена', color: 'border-rose-300 bg-rose-50 text-rose-800' },
     { title: '✅ Выполнено', status: 'Выполнено', color: 'border-emerald-300 bg-emerald-50 text-emerald-800' }
   ];
+
+  const allDevsList = [];
+  Object.entries(roleDevelopers).forEach(([roleName, devsArray]) => {
+    devsArray.forEach(d => { allDevsList.push({ name: d, role: roleName }); });
+  });
+
+  const devAnalytics = {};
+  allDevsList.forEach(item => {
+    devAnalytics[item.name] = { role: item.role, totalTasks: 0, completedTasks: 0, inProgressTasks: 0, backlogTasks: 0, totalDays: 0, projects: new Set() };
+  });
+
+  tasks.forEach(t => {
+    if (Array.isArray(t.roles)) {
+      t.roles.forEach(r => {
+        if (r && r.dev && devAnalytics[r.dev]) {
+          const stats = devAnalytics[r.dev];
+          stats.totalTasks += 1;
+          stats.totalDays += Number(r.estimateDays) || 0;
+          stats.projects.add(t.project);
+          if (t.status === 'Выполнено') stats.completedTasks += 1;
+          else if (t.status === 'В работе' || t.status === 'Тестирование') stats.inProgressTasks += 1;
+          else stats.backlogTasks += 1;
+        }
+      });
+    }
+  });
 
   return (
     <div className="min-h-screen text-slate-900 flex font-sans relative overflow-x-hidden" style={{ background: '#f5f6f8' }}>
@@ -340,7 +357,6 @@ export default function App() {
             </select>
           </div>
           <div className="flex items-center gap-3">
-            {/* Кнопка с абсолютной кликабельностью */}
             <button 
               type="button"
               onClick={handleResetToExcel} 
@@ -467,7 +483,69 @@ export default function App() {
             </div>
           )}
 
-          {/* НАПОМИНАНИЯ И КОНТРОЛЬ СРОКОВ */}
+          {/* ИСПРАВЛЕННЫЙ ГАНТ (БЕЗ СМЕЩЕНИЙ И НАСЛОЕНИЙ) */}
+          {activeTab === 'gantt' && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+              <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2"><Calendar className="text-[#cb11ab]" /> Диаграмма Ганта</h3>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-medium text-slate-500">Масштаб:</span>
+                  <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200 text-xs">
+                    <button onClick={() => setGanttScale('days')} className={`px-3 py-1.5 rounded-lg font-medium transition-all ${ganttScale === 'days' ? 'bg-white text-[#cb11ab] shadow-sm' : 'text-slate-600'}`}>Дни</button>
+                    <button onClick={() => setGanttScale('weeks')} className={`px-3 py-1.5 rounded-lg font-medium transition-all ${ganttScale === 'weeks' ? 'bg-white text-[#cb11ab] shadow-sm' : 'text-slate-600'}`}>Недели</button>
+                    <button onClick={() => setGanttScale('months')} className={`px-3 py-1.5 rounded-lg font-medium transition-all ${ganttScale === 'months' ? 'bg-white text-[#cb11ab] shadow-sm' : 'text-slate-600'}`}>Месяцы</button>
+                    <button onClick={() => setGanttScale('years')} className={`px-3 py-1.5 rounded-lg font-medium transition-all ${ganttScale === 'years' ? 'bg-white text-[#cb11ab] shadow-sm' : 'text-slate-600'}`}>Годы</button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-auto max-h-[650px] border border-slate-200 rounded-xl relative shadow-sm">
+                <div className={ganttScale === 'days' ? 'min-w-[2600px]' : ganttScale === 'weeks' ? 'min-w-[2000px]' : 'min-w-[1600px]'}>
+                  <div className="sticky top-0 z-40 bg-slate-100 border-b border-slate-300 shadow-sm flex items-center py-2.5 px-3">
+                    <div className="w-80 font-bold text-xs text-slate-700 shrink-0">Название задачи</div>
+                    <div className="w-32 font-bold text-xs text-slate-700 shrink-0">Статус</div>
+                    <div className="w-24 font-bold text-xs text-slate-700 shrink-0">Дней</div>
+                    <div className="flex-1 font-bold text-xs text-slate-600 text-center">
+                      {ganttScale === 'years' && 'Шкала времени: 2024 — 2027'}
+                      {ganttScale === 'months' && 'Шкала времени по месяцам (2025 - 2026)'}
+                      {ganttScale === 'weeks' && 'Недельное расписание'}
+                      {ganttScale === 'days' && 'Детализация по дням (Август 2026)'}
+                    </div>
+                  </div>
+
+                  <div className="divide-y divide-slate-100 bg-white">
+                    {filteredTasks.map(t => {
+                      const isDone = t.status === 'Выполнено';
+                      const isInProgress = t.status === 'В работе' || t.status === 'Тестирование';
+                      const barStyle = getGanttBarStyles(t.startDate || '2025-09-01', t.deadline || '2026-12-31', ganttScale);
+                      const taskDays = getTotalTaskDays(t);
+
+                      return (
+                        <div key={t.id} onClick={() => { setSelectedTaskForModal(t); setTaskModalTab('chat'); }} className="flex items-center text-xs py-2.5 px-3 hover:bg-slate-50 transition-colors cursor-pointer">
+                          <div className="w-80 pr-2 shrink-0">
+                            <span className="text-[10px] font-bold text-[#cb11ab] block">[{t.project}]</span>
+                            <span className="font-semibold text-slate-800 truncate block" title={t.name}>{t.name}</span>
+                          </div>
+                          <div className="w-32 shrink-0">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-medium inline-block ${isDone ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>{t.status}</span>
+                          </div>
+                          <div className="w-24 shrink-0 font-mono font-bold text-slate-700 flex items-center gap-1">
+                            <Clock size={12} className="text-[#cb11ab]" /> {taskDays}
+                          </div>
+                          <div className="flex-1 relative bg-slate-50 h-7 rounded-lg flex items-center px-1 border border-slate-200 overflow-hidden ml-4">
+                            <div className={`absolute h-4 rounded-md shadow-sm z-10 transition-all ${isDone ? 'bg-emerald-500' : isInProgress ? 'bg-[#cb11ab]' : 'bg-amber-400'}`} style={barStyle}></div>
+                            <span className="relative z-20 text-[10px] font-mono text-slate-700 pl-2 font-bold bg-white/80 px-1 rounded">Дедлайн: {t.deadline}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* НАПОМИНАНИЯ */}
           {activeTab === 'reminders' && (
             <div className="space-y-6 max-w-4xl">
               <div>
@@ -512,70 +590,6 @@ export default function App() {
                   </div>
                 );
               })()}
-            </div>
-          )}
-
-          {/* ГАНТ */}
-          {activeTab === 'gantt' && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
-              <div className="flex justify-between items-center border-b border-slate-200 pb-4">
-                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2"><Calendar className="text-[#cb11ab]" /> Диаграмма Ганта</h3>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-medium text-slate-500">Масштаб:</span>
-                  <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200 text-xs">
-                    <button onClick={() => setGanttScale('days')} className={`px-3 py-1.5 rounded-lg font-medium transition-all ${ganttScale === 'days' ? 'bg-white text-[#cb11ab] shadow-sm' : 'text-slate-600'}`}>Дни</button>
-                    <button onClick={() => setGanttScale('weeks')} className={`px-3 py-1.5 rounded-lg font-medium transition-all ${ganttScale === 'weeks' ? 'bg-white text-[#cb11ab] shadow-sm' : 'text-slate-600'}`}>Недели</button>
-                    <button onClick={() => setGanttScale('months')} className={`px-3 py-1.5 rounded-lg font-medium transition-all ${ganttScale === 'months' ? 'bg-white text-[#cb11ab] shadow-sm' : 'text-slate-600'}`}>Месяцы</button>
-                    <button onClick={() => setGanttScale('years')} className={`px-3 py-1.5 rounded-lg font-medium transition-all ${ganttScale === 'years' ? 'bg-white text-[#cb11ab] shadow-sm' : 'text-slate-600'}`}>Годы</button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="overflow-auto max-h-[650px] border border-slate-200 rounded-xl relative shadow-sm">
-                <div className={ganttScale === 'days' ? 'min-w-[2800px]' : ganttScale === 'weeks' ? 'min-w-[2200px]' : 'min-w-[1900px]'}>
-                  <div className="sticky top-0 z-40 bg-slate-100 border-b border-slate-300 shadow-sm">
-                    <div className="grid grid-cols-12 text-xs font-bold text-slate-800 text-center py-2 border-b border-slate-200">
-                      <div className="w-80 text-left pl-4 sticky left-0 bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Название задачи</div>
-                      <div className="w-32 sticky left-80 bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Статус</div>
-                      <div className="w-24 sticky left-[448px] bg-slate-100 z-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Дней</div>
-                      <div className="col-span-8 flex items-center justify-around font-bold text-xs px-4">
-                        {ganttScale === 'years' && <div className="w-full flex justify-around text-[#cb11ab]"><span>📅 2024</span><span className="border-l-2 border-[#cb11ab] pl-4">📅 2025</span><span className="border-l-2 border-[#cb11ab] pl-4">📅 2026</span><span className="border-l-2 border-[#cb11ab] pl-4">📅 2027</span></div>}
-                        {ganttScale === 'months' && <div className="w-full flex justify-around"><span className="text-[#cb11ab]">2025 (Второе полугодие)</span><span className="border-l-2 border-[#cb11ab] pl-4 text-emerald-800">2026 (Весь год)</span></div>}
-                        {ganttScale === 'weeks' && <div className="w-full text-slate-600">Недельное расписание</div>}
-                        {ganttScale === 'days' && <div className="w-full text-slate-600">Детализация по дням — Август 2026</div>}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="divide-y divide-slate-100 bg-white">
-                    {filteredTasks.map(t => {
-                      const isDone = t.status === 'Выполнено';
-                      const isInProgress = t.status === 'В работе' || t.status === 'Тестирование';
-                      const barStyle = getGanttBarStyles(t.startDate || '2025-09-01', t.deadline || '2026-12-31', ganttScale);
-                      const taskDays = getTotalTaskDays(t);
-
-                      return (
-                        <div key={t.id} onClick={() => { setSelectedTaskForModal(t); setTaskModalTab('chat'); }} className="grid grid-cols-12 items-center text-xs py-2.5 px-2 hover:bg-slate-50 transition-colors cursor-pointer">
-                          <div className="w-80 pr-2 pl-2 sticky left-0 bg-white z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                            <span className="text-[10px] font-bold text-[#cb11ab] block">[{t.project}]</span>
-                            <span className="font-semibold text-slate-800 truncate block" title={t.name}>{t.name}</span>
-                          </div>
-                          <div className="w-32 sticky left-80 bg-white z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-medium inline-block ${isDone ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>{t.status}</span>
-                          </div>
-                          <div className="w-24 sticky left-[448px] bg-white z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] text-xs font-mono font-bold text-slate-700 pl-2 flex items-center gap-1">
-                            <Clock size={12} className="text-[#cb11ab]" /> {taskDays}
-                          </div>
-                          <div className="col-span-8 relative bg-slate-50 h-7 rounded-lg flex items-center px-1 border border-slate-200 ml-4 overflow-hidden">
-                            <div className={`absolute h-4 rounded-md shadow-sm z-10 transition-all ${isDone ? 'bg-emerald-500' : isInProgress ? 'bg-[#cb11ab]' : 'bg-amber-400'}`} style={barStyle}></div>
-                            <span className="relative z-20 text-[10px] font-mono text-slate-700 pl-2 font-bold bg-white/80 px-1 rounded">Дедлайн: {t.deadline}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
@@ -635,7 +649,7 @@ export default function App() {
             </div>
           )}
 
-          {/* ЗАМЕТКИ И ЗАДАЧНИК (СВОРАЧИВАЕМЫЕ ПО УМОЛЧАНИЮ) */}
+          {/* ЗАМЕТКИ (СВОРАЧИВАЕМЫЕ ПО УМОЛЧАНИЮ) */}
           {activeTab === 'notes' && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 max-w-5xl">
               <div className="flex justify-between items-center border-b border-slate-200 pb-4">
@@ -719,16 +733,23 @@ export default function App() {
             </div>
           )}
 
+          {/* ИСПРАВЛЕННАЯ АНАЛИТИКА (УСТРАНЕН БЕЛЫЙ ЭКРАН) */}
           {activeTab === 'analytics' && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
               <h3 className="text-lg font-semibold text-slate-800">Детальная аналитика по разработчикам</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {allDevsList.map(item => {
-                  const stats = devAnalytics[item.name] || { totalTasks: 0, completedTasks: 0, inProgressTasks: 0, backlogTasks: 0, totalDays: 0, projects: new Set() };
-                  const projectsArr = Array.from(stats.projects);
+                {allDevsList.map((item, idx) => {
+                  const stats = devAnalytics[item.name] || { role: item.role, totalTasks: 0, completedTasks: 0, inProgressTasks: 0, backlogTasks: 0, totalDays: 0, projects: new Set() };
+                  const projectsArr = Array.from(stats.projects || []);
                   return (
-                    <div key={item.name} className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
-                      <div className="flex justify-between items-start"><div><h4 className="font-bold text-base text-slate-800">{item.name}</h4><span className="text-xs text-[#cb11ab]">Роль: {item.role}</span></div><span className="text-xs bg-[#cb11ab]/10 text-[#cb11ab] px-3 py-1 rounded-full font-semibold">Всего: {stats.totalTasks}</span></div>
+                    <div key={idx} className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-bold text-base text-slate-800">{item.name}</h4>
+                          <span className="text-xs text-[#cb11ab]">Роль: {item.role}</span>
+                        </div>
+                        <span className="text-xs bg-[#cb11ab]/10 text-[#cb11ab] px-3 py-1 rounded-full font-semibold">Всего: {stats.totalTasks}</span>
+                      </div>
                       <div className="grid grid-cols-3 gap-2 text-center py-2 bg-white rounded-xl border text-xs">
                         <div><div className="text-slate-500">Выполнено</div><div className="text-sm font-bold text-emerald-600">{stats.completedTasks}</div></div>
                         <div><div className="text-slate-500">В работе</div><div className="text-sm font-bold text-blue-600">{stats.inProgressTasks}</div></div>
@@ -736,6 +757,7 @@ export default function App() {
                       </div>
                       <div className="text-xs text-slate-600 space-y-1.5">
                         <div className="flex justify-between"><span>Оценка:</span><strong className="font-mono">{stats.totalDays} раб. дней</strong></div>
+                        <div><span>Проекты:</span> <span className="text-slate-700">{projectsArr.join(', ') || 'Нет проектов'}</span></div>
                       </div>
                     </div>
                   );
