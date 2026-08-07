@@ -42,7 +42,7 @@ export default function App() {
   const initial50Tasks = [
     { id: 1, project: "WMS MOBILE", name: "Снятие Рефакторинг", status: "Тестирование", priority: "Высокий", dependsOn: null, roles: [{ role: "Mobile", dev: "Сухоруков Роман", estimateDays: 10, planStart: "2026-04-01", planEnd: "2026-05-05", factEnd: "" }, { role: "Testing", dev: "Склад", estimateDays: 10, planStart: "2026-08-05", planEnd: "2026-08-10", factEnd: "" }], resultsHistory: ["Успешный прогон автотестов рефакторинга"], deadline: "2026-08-10", startDate: "2026-04-01" },
     { id: 2, project: "Поиск", name: "Модуль поиска списанных вещей", status: "В работе", priority: "Средний", dependsOn: null, roles: [{ role: "DB", dev: "Голик Егор", estimateDays: 10, planStart: "2026-07-31", planEnd: "2026-08-03", factEnd: "" }, { role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "2026-08-03", planEnd: "2026-08-04", factEnd: "" }, { role: "Mobile", dev: "Вавулин Елисей", estimateDays: 4, planStart: "2026-08-04", planEnd: "2026-08-10", factEnd: "" }], resultsHistory: [], deadline: "2026-08-10", startDate: "2026-07-31" },
-    { id: 3, project: "Инвентаризация", name: "Сервис для валидации ШК", status: "В работе", priority: "Высокий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "2026-07-31", planEnd: "2026-08-05", factEnd: "" }], resultsHistory: [], deadline: "2026-08-05", startDate: "2026-07-31" }, // просрочена относительно 2026-08-06
+    { id: 3, project: "Инвентаризация", name: "Сервис для валидации ШК", status: "В работе", priority: "Высокий", dependsOn: null, roles: [{ role: "Backend", dev: "Брянцев Александр", estimateDays: 5, planStart: "2026-07-31", planEnd: "2026-08-05", factEnd: "" }], resultsHistory: [], deadline: "2026-08-05", startDate: "2026-07-31" },
     { id: 4, project: "Отчетность", name: "Переработка отчёта \"Общие показатели инвентаризации\"", status: "В работе", priority: "Средний", dependsOn: null, roles: [{ role: "OLAP", dev: "Довгань Алексей", estimateDays: 14, planStart: "2026-05-08", planEnd: "2026-05-11", factEnd: "" }, { role: "Frontend", dev: "Сергей", estimateDays: 10, planStart: "2026-08-11", planEnd: "2026-08-25", factEnd: "" }], resultsHistory: [], deadline: "2026-08-25", startDate: "2026-05-08" },
     { id: 5, project: "Инвентаризация", name: "Точечная инвентаризация по УИН", status: "Бэклог", priority: "Высокий", dependsOn: null, roles: [{ role: "DB", dev: "Цветкова Арина", estimateDays: 2, planStart: "2026-07-31", planEnd: "2026-08-04", factEnd: "" }, { role: "Backend", dev: "Брянцев Александр", estimateDays: 2, planStart: "2026-08-05", planEnd: "2026-08-07", factEnd: "" }, { role: "Mobile", dev: "Сухоруков Роман", estimateDays: 5, planStart: "2026-08-07", planEnd: "2026-08-14", factEnd: "" }], resultsHistory: [], deadline: "2026-08-14", startDate: "2026-07-31" },
     { id: 6, project: "Инвентаризация", name: "Изменение условий отбора улиц для инвентаризации для низкооборачиваемых зон", status: "Бэклог", priority: "Средний", dependsOn: null, roles: [{ role: "OLAP", dev: "Гузенко Антон", estimateDays: 5, planStart: "2026-08-01", planEnd: "2026-08-10", factEnd: "" }], resultsHistory: [], deadline: "2026-08-10", startDate: "2026-08-01" },
@@ -93,7 +93,7 @@ export default function App() {
   ];
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('wms_hub_light_v21');
+    const saved = localStorage.getItem('wms_hub_light_v22');
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
@@ -119,13 +119,13 @@ export default function App() {
   });
 
   const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', content: 'Привет! Я полноценный ИИ-ассистент WMS Hub. Спрашивайте про просрочки, кварталы, проекты, метрики или пишите "Создай задачу: [название]".' }
+    { role: 'assistant', content: 'Привет! Я полноценный ИИ-ассистент WMS Hub. Спрашивайте про просрочки ("Найди просрочки"), кварталы, проекты или пишите "Создай задачу: [название]".' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('wms_hub_light_v21', JSON.stringify(tasks));
+    localStorage.setItem('wms_hub_light_v22', JSON.stringify(tasks));
   }, [tasks]);
 
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function App() {
 
   const handleResetToExcel = () => {
     setTasks(initial50Tasks);
-    localStorage.setItem('wms_hub_light_v21', JSON.stringify(initial50Tasks));
+    localStorage.setItem('wms_hub_light_v22', JSON.stringify(initial50Tasks));
   };
 
   const projectsList = Array.from(new Set(tasks.map(t => t.project)));
@@ -235,7 +235,7 @@ export default function App() {
     });
   };
 
-  // Умный ИИ с поиском просрочек относительно 2026-08-06, кварталов и созданием задач
+  // Умный ИИ с корректным поиском просрочек и кварталов
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputMessage || !inputMessage.trim()) return;
@@ -249,7 +249,7 @@ export default function App() {
     setTimeout(() => {
       let reply = '';
       const lower = userText.toLowerCase();
-      const currentDate = '2026-08-06'; // текущая дата по контексту
+      const currentDate = '2026-08-06'; // текущая дата
 
       if (lower.includes('создай задачу') || lower.includes('добавь задачу') || lower.includes('новая задача')) {
         let taskName = userText.replace(/создай задачу|добавь задачу|новая задача/gi, '').trim();
@@ -612,24 +612,28 @@ export default function App() {
             </div>
           )}
 
-          {/* НАСТОЯЩИЙ ГАНТ КАК НА СКРИШОТЕ ИЗ EXCEL (С ТАБЛИЦЕЙ СЛЕВА И СЕТКОЙ МЕСЯЦЕВ СПРАВА) */}
+          {/* НАСТОЯЩИЙ ГАНТ С ФИКСИРОВАННЫМИ КОЛОНКАМИ (КАК В YOUGILE) */}
           {activeTab === 'gantt' && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
               <div className="flex justify-between items-center border-b border-slate-200 pb-4">
                 <h3 className="text-lg font-bold text-slate-800">📊 ГАНТ ПО ЗАДАЧАМ - 2025-2026</h3>
                 <div className="flex items-center gap-4 text-xs text-slate-600 font-medium">
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-emerald-500"></span> Выполнено / План</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-emerald-500"></span> Выполнено</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-[#cb11ab]"></span> В работе</span>
                 </div>
               </div>
 
-              <div className="overflow-x-auto pb-4 border border-slate-200 rounded-xl">
-                <div className="min-w-[1200px]">
-                  {/* Заголовки месяцев по оси X */}
-                  <div className="grid grid-cols-12 bg-slate-100 border-b border-slate-200 text-[11px] font-bold text-slate-700 text-center py-2">
-                    <div className="col-span-3 text-left pl-4">Проект & Задача</div>
-                    <div className="col-span-1">Статус</div>
-                    <div className="col-span-8 grid grid-cols-8 text-[10px] text-slate-500">
+              {/* Обертка с горизонтальным скроллом */}
+              <div className="overflow-x-auto pb-4 border border-slate-200 rounded-xl relative">
+                <div className="min-w-[1400px]">
+                  {/* Шапка таблицы */}
+                  <div className="grid grid-cols-12 bg-slate-100 border-b border-slate-200 text-[11px] font-bold text-slate-700 text-center py-2.5 items-center">
+                    {/* Фиксированные слева колонки */}
+                    <div className="col-span-3 text-left pl-4 sticky left-0 bg-slate-100 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Проект & Задача</div>
+                    <div className="col-span-1 sticky left-[25%] bg-slate-100 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Статус</div>
+                    
+                    {/* Шкала дат справа */}
+                    <div className="col-span-8 grid grid-cols-8 text-[10px] text-slate-500 font-mono">
                       <span>2025-Q3</span>
                       <span>2025-Q4</span>
                       <span>2026-Q1</span>
@@ -648,22 +652,26 @@ export default function App() {
                       const isInProgress = t.status === 'В работе' || t.status === 'Тестирование';
                       return (
                         <div key={t.id} className="grid grid-cols-12 items-center text-xs py-2 px-2 hover:bg-slate-50">
-                          <div className="col-span-3 pr-2 pl-2">
+                          {/* Фиксированный проект и задача слева */}
+                          <div className="col-span-3 pr-2 pl-2 sticky left-0 bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                             <span className="text-[10px] font-bold text-[#cb11ab] block">[{t.project}]</span>
                             <span className="font-semibold text-slate-800 truncate block" title={t.name}>{t.name}</span>
                           </div>
-                          <div className="col-span-1">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                          
+                          {/* Фиксированный статус слева */}
+                          <div className="col-span-1 sticky left-[25%] bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-medium inline-block ${
                               isDone ? 'bg-emerald-50 text-emerald-700' : isInProgress ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600'
                             }`}>{t.status}</span>
                           </div>
-                          <div className="col-span-8 relative bg-slate-50 h-6 rounded flex items-center px-1 border border-slate-200">
-                            {/* Индикатор визуализации шкалы старта и дедлайна */}
-                            <div className={`absolute h-3 rounded ${
+
+                          {/* Широкая расширяющаяся шкала Ганта справа */}
+                          <div className="col-span-8 relative bg-slate-50 h-7 rounded flex items-center px-1 border border-slate-200 ml-2">
+                            <div className={`absolute h-4 rounded shadow-sm ${
                               isDone ? 'bg-emerald-500' : isInProgress ? 'bg-[#cb11ab]' : 'bg-amber-400'
-                            }`} style={{ left: '10%', right: '15%' }}></div>
-                            <span className="relative z-10 text-[9px] font-mono text-white pl-1 font-bold">
-                              С: {t.startDate || '2026-04-01'} → До: {t.deadline}
+                            }`} style={{ left: '12%', right: '18%' }}></div>
+                            <span className="relative z-10 text-[10px] font-mono text-white pl-2 font-bold">
+                              С: {t.startDate || '2026-04-01'} → Дедлайн: {t.deadline}
                             </span>
                           </div>
                         </div>
